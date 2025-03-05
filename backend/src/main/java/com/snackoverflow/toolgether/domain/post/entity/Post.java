@@ -1,5 +1,7 @@
 package com.snackoverflow.toolgether.domain.post.entity;
 
+import com.snackoverflow.toolgether.domain.post.entity.enums.Category;
+import com.snackoverflow.toolgether.domain.post.entity.enums.PriceType;
 import com.snackoverflow.toolgether.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
