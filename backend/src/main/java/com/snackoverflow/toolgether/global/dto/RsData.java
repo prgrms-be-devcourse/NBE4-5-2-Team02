@@ -1,4 +1,4 @@
-package com.snackoverflow.toolgether.domain.global.dto;
+package com.snackoverflow.toolgether.global.dto;
 
 import lombok.Getter;
 

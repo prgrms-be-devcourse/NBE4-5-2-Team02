@@ -1,4 +1,4 @@
-package com.snackoverflow.toolgether.domain.global.exception;
+package com.snackoverflow.toolgether.global.exception;
 
 import lombok.Getter;
 
