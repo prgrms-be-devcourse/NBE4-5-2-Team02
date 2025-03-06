@@ -1,9 +1,10 @@
 .rbc-calendar {
-  width: 80%;
+  width: 50%;
 }
 .rbc-toolbar {
   display: flex;
   flex-direction: column;
+  margin-bottom: 10px;
 }
 .rbc-month-view,
 .rbc-month-view *,
