@@ -1,9 +1,11 @@
 import ClientPage from "./ClientPage";
 
+// 페이지 디렉토리 이동 필요 예상 -> (app/post/[id]/reservation/)
+
 const mockUpUser = {
   result: "200-1",
   data: {
-    id: 123,
+    id: 2,
     nickname: "닉네임",
     username: "testId",
     profileImage: "image.png",
@@ -24,6 +26,7 @@ const mockUpPost = {
   result: "200-1",
   data: {
     id: 1,
+    userId: 1,
     title: "전동 드릴 대여합니다",
     content: "전동 드릴 대여합니다. 연락주세요",
     createdAt: "2025-03-10T10:11:00",

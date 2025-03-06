@@ -7,6 +7,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./CustomCalendar.css";
 import { useEffect, useState } from "react";
 import DateBox from "./DataBox";
+import { useRouter } from "next/navigation";
 
 interface SlotInfo {
   start: Date;
@@ -36,6 +37,7 @@ export default function ClientPage({
     credit: number;
   };
   post: {
+    userId: any;
     id: number;
     title: string;
     content: string;
@@ -169,6 +171,61 @@ export default function ClientPage({
   const handleEndTimeChange = (time: string) => {
     setEndTime(time);
   };
+  const router = useRouter();
+  // 보증금
+  const deposit = 10000;
+
+  const handleReservation = async () => {
+    try {
+      if (selectedDates.length === 2) {
+        const startDate = moment(selectedDates[0])
+          .format("YYYY-MM-DD")
+          .concat(`T${startTime}:00`);
+        const endDate = moment(selectedDates[1])
+          .format("YYYY-MM-DD")
+          .concat(`T${endTime}:00`);
+
+        const reservationData = {
+          postId: post.id,
+          renterId: me.id,
+          ownerId: post.userId,
+          startTime: startDate,
+          endTime: endDate,
+          deposit: deposit,
+          rentalFee: totalPrice,
+        };
+
+        const response = await fetch(
+          "http://localhost:8080/api/v1/reservations/request",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(reservationData),
+          }
+        );
+
+        console.log("예약 신청 요청:", reservationData);
+
+        if (response.ok) {
+          alert("예약 신청이 완료되었습니다.");
+          router.push("/");
+        } else {
+          const errorData = await response.json();
+          console.error("예약 신청 실패:", errorData);
+          alert(
+            `예약 신청에 실패했습니다. ${errorData.message || "서버 오류"}`
+          );
+        }
+      } else {
+        alert("날짜를 선택해주세요.");
+      }
+    } catch (error) {
+      console.error("예약 신청 중 오류 발생:", error);
+      alert("예약 신청 중 오류가 발생했습니다.");
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -218,10 +275,20 @@ export default function ClientPage({
             {moment(selectedDates[1]).format("M월 DD일")} {endTime}
           </div>
           <div className="mt-1">{usageDuration}</div>
+          <div className="mt-4">
+            <b>대여료</b> {totalPrice}원
+          </div>{" "}
+          <div className="mt-1">
+            {" "}
+            <b>보증금</b> {deposit}원
+          </div>
           <hr />
-          <div className="mt-4 font-bold">합계 {totalPrice}원</div>
+          <div className="mt-4 font-bold">합계 {totalPrice + deposit}원</div>
         </div>
-        <button className="mt-4 mb-4 bg-green-300 text-black p-2 rounded-md w-full font-bold">
+        <button
+          className="mt-4 mb-4 bg-green-300 text-black p-2 rounded-md w-full font-bold"
+          onClick={handleReservation}
+        >
           동의하고 예약 신청하기
         </button>
       </div>
