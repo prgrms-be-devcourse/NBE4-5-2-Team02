@@ -62,23 +62,24 @@ public class BaseInitData {
 	public void reservationInit() {
 
 //        UserInitData 전부 삭제 후 재생성 코드
-//        reviewRepository.deleteAll();
-//        reservationRepository.deleteAll();
-//        postRepository.deleteAll();
-//        userRepository.deleteAll();
+        reviewRepository.deleteAll();
+        reservationRepository.deleteAll();
+        postRepository.deleteAll();
+        userRepository.deleteAll();
 //
 //        // AUTO_INCREMENT 초기화
-//        entityManager.createNativeQuery("ALTER TABLE review AUTO_INCREMENT = 1").executeUpdate();
-//        entityManager.createNativeQuery("ALTER TABLE reservation AUTO_INCREMENT = 1").executeUpdate();
-//        entityManager.createNativeQuery("ALTER TABLE post AUTO_INCREMENT = 1").executeUpdate();
-//        entityManager.createNativeQuery("ALTER TABLE users AUTO_INCREMENT = 1").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE review AUTO_INCREMENT = 1").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE reservation AUTO_INCREMENT = 1").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE post AUTO_INCREMENT = 1").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE users AUTO_INCREMENT = 1").executeUpdate();
 
         if(userRepository.count() > 0) {
 			return;
 		}
 		User user1 = User.builder()
 			.address(new Address("서울", "강남구", "12345")) // Address 객체 생성 및 설정
-			.nickname("사람")
+			.username("human123")
+			.nickname("사람이")
 			.password("1234")
 			.score(30)
 			.phoneNumber("01012345678")
@@ -99,6 +100,7 @@ public class BaseInitData {
 
 		User user2 = User.builder()
 			.address(new Address("부산", "해운대구", "67890"))
+			.username("seaman222")
 			.nickname("바다사람")
 			.password("5678")
 			.score(50)
@@ -122,7 +124,7 @@ public class BaseInitData {
         User googleUser = User.builder()
                 .username(null)
                 .password(null)
-                .nickname("구글유저")
+                .nickname("googleUser")
                 .email("googleuser@gmail.com")
                 .phoneNumber("000-0000-0004")
                 .address(new Address("서울시 종로구", "청진동 101-11", "10111"))

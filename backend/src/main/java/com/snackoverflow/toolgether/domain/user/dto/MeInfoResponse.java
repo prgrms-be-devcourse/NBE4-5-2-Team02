@@ -11,7 +11,7 @@ public record MeInfoResponse(
         @NonNull String nickname,
         String username,
         String profileImage,
-        @NonNull String email,
+        String email,
         @NonNull String phoneNumber,
         @NonNull AddressInfo address,
         @NonNull LocalDateTime createdAt,

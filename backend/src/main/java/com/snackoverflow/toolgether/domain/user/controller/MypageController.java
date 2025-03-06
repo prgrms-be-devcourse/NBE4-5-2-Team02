@@ -7,9 +7,12 @@ import com.snackoverflow.toolgether.domain.reservation.service.ReservationServic
 import com.snackoverflow.toolgether.domain.review.service.ReviewService;
 import com.snackoverflow.toolgether.domain.user.dto.MeInfoResponse;
 import com.snackoverflow.toolgether.domain.user.dto.MyReservationInfoResponse;
+import com.snackoverflow.toolgether.domain.user.entity.User;
 import com.snackoverflow.toolgether.domain.user.service.UserService;
 import com.snackoverflow.toolgether.global.dto.RsData;
 import com.snackoverflow.toolgether.global.exception.ServiceException;
+import com.snackoverflow.toolgether.global.filter.CustomUserDetails;
+import com.snackoverflow.toolgether.global.filter.Login;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,14 +35,13 @@ public class MypageController {
     private final PostImageService postImageService;
 
     @GetMapping("/me")
-    public RsData<MeInfoResponse> getMyInfo() {
-        // TODO: 현재 로그인한 유저의 정보를 가져오는 로직을 추가해야 합니다.
-        // 그 전까지는 baseInitData에서 생성한 첫번째 유저를 가져옵니다.
-        if (false) {
-            throw new ServiceException("401-1", "인증이 필요한 요청입니다");
-        }
-        long id = 1L;
-        MeInfoResponse meInfoResponse = userService.getMeInfo(id);
+    public RsData<MeInfoResponse> getMyInfo(
+            @Login CustomUserDetails customUserDetails
+    ) {
+        String username = customUserDetails.getUsername();
+        User user = userService.findByUsername(username);
+        Long userId = user.getId();
+        MeInfoResponse meInfoResponse = userService.getMeInfo(userId);
 
         return new RsData<>(
                 "200-1",
@@ -50,20 +52,12 @@ public class MypageController {
 
     @Transactional(readOnly = true)
     @GetMapping("/reservations")
-    public RsData<Map<String, List<MyReservationInfoResponse>>> getMyReservations() {
-        // TODO: 현재 로그인한 유저의 예약 정보를 가져오는 로직을 추가해야 합니다.
-        // 그 전까지는 baseInitData에서 생성한 첫번째 유저를 가져옵니다.
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        Long userId = ((com.snackoverflow.toolgether.domain.user.entity.User) authentication.getPrincipal()).getId(); // UserDetails 인터페이스 구현 필요
-
-        if (false) {
-            throw new ServiceException("401-1", "인증이 필요한 요청입니다");
-        } else if (false) {
-            throw new ServiceException("404-1", "해당 유저를 찾을 수 없습니다");
-        } else if (false) {
-            throw new ServiceException("403-1", "권한이 없는 요청입니다");
-        }
-        long userId = 2L;
+    public RsData<Map<String, List<MyReservationInfoResponse>>> getMyReservations(
+            @Login CustomUserDetails customUserDetails
+    ) {
+        String username = customUserDetails.getUsername();
+        User user = userService.findByUsername(username);
+        Long userId = user.getId();
 
         List<Reservation> rentals = reservationService.getRentalReservations(userId);
         List<Reservation> borrows = reservationService.getBorrowReservations(userId);

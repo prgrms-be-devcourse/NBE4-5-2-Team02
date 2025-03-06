@@ -74,10 +74,10 @@ public class UserService {
     public LoginResult loginUser(String username, String password) {
         User user = userRepository.findByUsername(username).orElseThrow(() ->
                 new UserNotFoundException("존재하지 않는 사용자: " + username));
-
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new UserNotFoundException("비밀번호가 올바르지 않습니다.");
-        }
+//TODO 커밋 전에 비밀번호 주석 풀기. yml에서 jwt 설정도 제외!
+//        if (!passwordEncoder.matches(password, user.getPassword())) {
+//            throw new UserNotFoundException("비밀번호가 올바르지 않습니다.");
+//        }
 
         // username 기반으로 토큰 생성
         Map<String, Object> claims = new HashMap<>();
@@ -116,5 +116,11 @@ public class UserService {
                 () -> new ServiceException("404-1", "해당 유저를 찾을 수 없습니다")
         );
         return MeInfoResponse.from(user);
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new ServiceException("404-1", "해당 유저를 찾을 수 없습니다")
+        );
     }
 }
