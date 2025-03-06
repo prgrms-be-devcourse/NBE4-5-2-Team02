@@ -1,8 +1,19 @@
 package com.snackoverflow.toolgether.global.init;
 
+import com.snackoverflow.toolgether.domain.post.entity.Category;
+import com.snackoverflow.toolgether.domain.post.entity.Post;
+import com.snackoverflow.toolgether.domain.post.entity.PriceType;
+import com.snackoverflow.toolgether.domain.post.repository.PostRepository;
+import com.snackoverflow.toolgether.domain.reservation.entity.Reservation;
+import com.snackoverflow.toolgether.domain.reservation.entity.ReservationStatus;
+import com.snackoverflow.toolgether.domain.reservation.repository.ReservationRepository;
+import com.snackoverflow.toolgether.domain.review.entity.Review;
+import com.snackoverflow.toolgether.domain.review.repository.ReviewRepository;
 import com.snackoverflow.toolgether.domain.user.entity.Address;
 import com.snackoverflow.toolgether.domain.user.entity.User;
 import com.snackoverflow.toolgether.domain.user.repository.UserRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
@@ -30,9 +41,15 @@ public class BaseInitData {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
+    private final ReservationRepository reservationRepository;
+    private final ReviewRepository reviewRepository;
+
 	@Autowired
 	@Lazy
 	private BaseInitData self;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
 	@Bean
 	public ApplicationRunner applicationRunner() {
@@ -41,19 +58,25 @@ public class BaseInitData {
 		};
 	}
 
-    @Bean
-    public ApplicationRunner applicationRunner2() {
-        return args -> {
-            self.userInit();
-        };
-    }
-
 	@Transactional
 	public void reservationInit() {
-		if(userRepository.count() > 0) {
+
+//        UserInitData 전부 삭제 후 재생성 코드
+//        reviewRepository.deleteAll();
+//        reservationRepository.deleteAll();
+//        postRepository.deleteAll();
+//        userRepository.deleteAll();
+//
+//        // AUTO_INCREMENT 초기화
+//        entityManager.createNativeQuery("ALTER TABLE review AUTO_INCREMENT = 1").executeUpdate();
+//        entityManager.createNativeQuery("ALTER TABLE reservation AUTO_INCREMENT = 1").executeUpdate();
+//        entityManager.createNativeQuery("ALTER TABLE post AUTO_INCREMENT = 1").executeUpdate();
+//        entityManager.createNativeQuery("ALTER TABLE users AUTO_INCREMENT = 1").executeUpdate();
+
+        if(userRepository.count() > 0) {
 			return;
 		}
-		User user = User.builder()
+		User user1 = User.builder()
 			.address(new Address("서울", "강남구", "12345")) // Address 객체 생성 및 설정
 			.nickname("사람")
 			.password("1234")
@@ -62,9 +85,9 @@ public class BaseInitData {
 			.latitude(37.5665)
 			.longitude(126.9780)
 			.build();
-		userRepository.save(user);
+		userRepository.save(user1);
 		postRepository.save(Post.builder()
-			.user(user)
+			.user(user1)
 			.title("제목입니다.")
 			.content("내용입니다.")
 			.category(Category.TOOL)
@@ -95,100 +118,89 @@ public class BaseInitData {
 			.longitude(129.1600)
 			.build();
 		postRepository.save(post2);
+
+        User googleUser = User.builder()
+                .username(null)
+                .password(null)
+                .nickname("구글유저")
+                .email("googleuser@gmail.com")
+                .phoneNumber("000-0000-0004")
+                .address(new Address("서울시 종로구", "청진동 101-11", "10111"))
+                .latitude(37.123)
+                .longitude(127.123)
+                .provider("google")
+                .providerId("google123456789")
+                .build();
+        userRepository.saveAndFlush(googleUser);
+        Post post3 = Post.builder()
+                .user(user1)
+                .title("전동 드릴 대여")
+                .content("상태 좋은 전동 드릴 빌려드립니다.")
+                .category(Category.TOOL)
+                .priceType(PriceType.DAY)
+                .price(10000)
+                .latitude(37.123)
+                .longitude(127.123)
+                .build();
+        postRepository.saveAndFlush(post3);
+
+        Post post4 = Post.builder()
+                .user(user2)
+                .title("캠핑 의자 세트 대여")
+                .content("편안한 캠핑 의자 세트 저렴하게 빌려가세요.")
+                .category(Category.TOOL)
+                .priceType(PriceType.DAY)
+                .price(5000)
+                .latitude(37.456)
+                .longitude(127.456)
+                .build();
+        postRepository.saveAndFlush(post4);
+
+        // Reservation 데이터 생성
+        Reservation reservation1 = Reservation.builder()
+                .post(post3)
+                .renter(user2)
+                .owner(user1)
+                .createAt(LocalDateTime.now())
+                .startTime(LocalDateTime.now().plusDays(1))
+                .endTime(LocalDateTime.now().plusDays(3))
+                .status(ReservationStatus.APPROVED)
+                .amount(20000.0)
+                .build();
+        reservationRepository.saveAndFlush(reservation1);
+
+        Reservation reservation2 = Reservation.builder()
+                .post(post4)
+                .renter(user1)
+                .owner(user2)
+                .createAt(LocalDateTime.now())
+                .startTime(LocalDateTime.now().plusDays(2))
+                .endTime(LocalDateTime.now().plusDays(5))
+                .status(ReservationStatus.DONE)
+                .amount(15000.0)
+                .build();
+        reservationRepository.saveAndFlush(reservation2);
+
+        // Review 데이터 생성 (reservation2에 대한 리뷰)
+        Review review1 = Review.builder()
+                .reviewer(user2) // user2가 작성
+                .reviewee(user1) // user1에게 리뷰
+                .reservation(reservation2)
+                .productScore(5)
+                .timeScore(5)
+                .kindnessScore(5)
+                .build();
+        reviewRepository.saveAndFlush(review1);
+
+        // Review 데이터 생성 (reservation2에 대한 리뷰)
+        Review review2 = Review.builder()
+                .reviewer(user1) // user1이 작성
+                .reviewee(user2) // user2에게 리뷰
+                .reservation(reservation2)
+                .productScore(4)
+                .timeScore(4)
+                .kindnessScore(4)
+                .build();
+        reviewRepository.saveAndFlush(review2);
 	}
-
-    @Transactional
-    public void userInit() {
-        System.out.println("UserInitData 실행");
-        if (userRepository.count() > 0) {
-            return;
-        }
-        try {
-            // Address 객체 생성
-            Address address1 = Address.builder()
-                    .mainAddress("서울시 강남구")
-                    .detailAddress("역삼동 123-45")
-                    .zipcode("12345")
-                    .build();
-
-            // 첫 번째 사용자 생성
-            User user1 = User.builder()
-                    .username("testId1")
-                    .password("password")
-                    .nickname("닉네임1")
-                    .email("test1@gmail.com")
-                    .phoneNumber("000-0000-0001")
-                    .address(address1)
-                    .latitude(37.123)
-                    .longitude(127.123)
-                    .createdAt(LocalDateTime.now())
-                    .build();
-            userRepository.saveAndFlush(user1);
-
-            // 두 번째 사용자 생성
-            Address address2 = Address.builder()
-                    .mainAddress("서울시 서초구")
-                    .detailAddress("양재동 678-90")
-                    .zipcode("67890")
-                    .build();
-            User user2 = User.builder()
-                    .username("testId2")
-                    .password("password")
-                    .nickname("닉네임2")
-                    .email("test2@gmail.com")
-                    .phoneNumber("000-0000-0002")
-                    .address(address2)
-                    .latitude(37.456)
-                    .longitude(127.456)
-                    .createdAt(LocalDateTime.now())
-                    .build();
-            userRepository.saveAndFlush(user2);
-
-            // 세 번째 사용자 생성
-            Address address3 = Address.builder()
-                    .mainAddress("서울시 종로구")
-                    .detailAddress("청진동 101-11")
-                    .zipcode("10111")
-                    .build();
-            User user3 = User.builder()
-                    .username("testId3")
-                    .password("password")
-                    .nickname("닉네임3")
-                    .email("test3@gmail.com")
-                    .phoneNumber("000-0000-0003")
-                    .address(address3)
-                    .latitude(37.789)
-                    .longitude(127.789)
-                    .createdAt(LocalDateTime.now())
-                    .build();
-            userRepository.saveAndFlush(user3);
-
-            // Google 소셜 로그인 사용자 생성
-            Address googleAddress = Address.builder()
-                    .mainAddress("미국 캘리포니아") // 임의의 주소
-                    .detailAddress("구글 본사") // 임의의 주소
-                    .zipcode("94043") // 임의의 우편번호
-                    .build();
-            User googleUser = User.builder()
-                    .username(null) // 소셜 로그인은 username이 없을 수 있습니다.
-                    .password(null) // 소셜 로그인은 password가 없습니다.
-                    .nickname("구글유저")
-                    .email("googleuser@gmail.com")
-                    .phoneNumber("000-0000-0004") // 소셜 로그인은 전화번호가 없을 수 있습니다.
-                    .address(googleAddress) // 소셜 로그인은 주소가 없을 수 있습니다.
-                    .latitude(37.123) // 적절한 위도/경도 값 설정
-                    .longitude(127.123)
-                    .createdAt(LocalDateTime.now())
-                    .provider("google") // provider 를 google 로 설정
-                    .providerId("google123456789") // 실제 providerId를 설정해야 합니다.
-                    .build();
-            userRepository.saveAndFlush(googleUser);
-
-            System.out.println("UserRepositoryTest 실행 완료");
-
-        } catch (Exception e) {
-            System.err.println("UserRepositoryTest 실행 중 오류 발생: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 }
