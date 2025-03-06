@@ -62,16 +62,16 @@ public class BaseInitData {
 	public void reservationInit() {
 
 //        UserInitData 전부 삭제 후 재생성 코드
-        reviewRepository.deleteAll();
-        reservationRepository.deleteAll();
-        postRepository.deleteAll();
-        userRepository.deleteAll();
+//        reviewRepository.deleteAll();
+//        reservationRepository.deleteAll();
+//        postRepository.deleteAll();
+//        userRepository.deleteAll();
 //
 //        // AUTO_INCREMENT 초기화
-        entityManager.createNativeQuery("ALTER TABLE review AUTO_INCREMENT = 1").executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE reservation AUTO_INCREMENT = 1").executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE post AUTO_INCREMENT = 1").executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE users AUTO_INCREMENT = 1").executeUpdate();
+//        entityManager.createNativeQuery("ALTER TABLE review AUTO_INCREMENT = 1").executeUpdate();
+//        entityManager.createNativeQuery("ALTER TABLE reservation AUTO_INCREMENT = 1").executeUpdate();
+//        entityManager.createNativeQuery("ALTER TABLE post AUTO_INCREMENT = 1").executeUpdate();
+//        entityManager.createNativeQuery("ALTER TABLE users AUTO_INCREMENT = 1").executeUpdate();
 
         if(userRepository.count() > 0) {
 			return;
