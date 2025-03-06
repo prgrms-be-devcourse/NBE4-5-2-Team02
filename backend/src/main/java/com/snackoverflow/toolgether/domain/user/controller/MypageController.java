@@ -11,8 +11,7 @@ import com.snackoverflow.toolgether.domain.user.service.UserService;
 import com.snackoverflow.toolgether.global.dto.RsData;
 import com.snackoverflow.toolgether.global.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,6 +48,7 @@ public class MypageController {
         );
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/reservations")
     public RsData<Map<String, List<MyReservationInfoResponse>>> getMyReservations() {
         // TODO: 현재 로그인한 유저의 예약 정보를 가져오는 로직을 추가해야 합니다.
