@@ -1,10 +1,10 @@
 package com.snackoverflow.toolgether.domain.post.controller;
 
-import com.snackoverflow.toolgether.domain.global.dto.RsData;
+import com.snackoverflow.toolgether.domain.post.dto.PostUpdateRequest;
+import com.snackoverflow.toolgether.global.dto.RsData;
 import com.snackoverflow.toolgether.domain.post.dto.PostCreateRequest;
 import com.snackoverflow.toolgether.domain.post.dto.PostResponse;
 import com.snackoverflow.toolgether.domain.post.service.PostService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +44,19 @@ public class PostController {
                 "204-1",
                 "게시물이 성공적으로 삭제되었습니다.",
                 null
+        );
+    }
+
+    @PutMapping("/{postId}")
+    public RsData<PostResponse> updatePost(
+            @PathVariable Long postId,
+            @RequestBody @Valid PostUpdateRequest request) {
+
+        PostResponse updatedPost = postService.updatePost(postId, request);
+        return new RsData<>(
+                "200-2",
+                "게시물이 성공적으로 수정되었습니다.",
+                updatedPost
         );
     }
 }
