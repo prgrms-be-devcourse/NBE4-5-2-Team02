@@ -1,0 +1,19 @@
+.rbc-calendar {
+  width: 80%;
+}
+.rbc-toolbar {
+  display: flex;
+  flex-direction: column;
+}
+.rbc-month-view,
+.rbc-month-view *,
+.rbc-month-row,
+.rbc-month-row *,
+.rbc-date-cell,
+.rbc-date-cell *,
+.rbc-header,
+.rbc-header *,
+.rbc-day-bg,
+.rbc-day-bg * {
+  border: none !important;
+}

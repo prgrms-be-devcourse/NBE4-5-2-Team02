@@ -4,6 +4,7 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "moment/locale/ko";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import "./CustomCalendar.css";
 import { useState } from "react";
 import DateBox from "./DataBox";
 
@@ -75,14 +76,6 @@ export default function ClientPage() {
     setShowTimeForm(true);
   };
 
-  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.name === "startTime") {
-      setStartTime(e.target.value);
-    } else {
-      setEndTime(e.target.value);
-    }
-  };
-
   const handleReservation = () => {
     if (selectedDates.length === 2) {
       const startDate = moment(selectedDates[0])
@@ -120,24 +113,7 @@ export default function ClientPage() {
 
   return (
     <div>
-      {showTimeForm && (
-        <div>
-          <input
-            type="time"
-            name="startTime"
-            value={startTime}
-            onChange={handleTimeChange}
-          />
-          <input
-            type="time"
-            name="endTime"
-            value={endTime}
-            onChange={handleTimeChange}
-          />
-          <button onClick={handleReservation}>예약</button>
-        </div>
-      )}
-      <div className="mt-4">
+      <div className="mt-4 flex justify-center">
         <Calendar
           localizer={localizer}
           startAccessor="start"
@@ -153,7 +129,9 @@ export default function ClientPage() {
           dayPropGetter={dayPropGetter}
         />
       </div>
-      <div className="flex mt-4">
+      <div className="flex mt-4 space-x-4 justify-center">
+        {" "}
+        {/* space-x-4 클래스 추가 */}
         <DateBox
           date={selectedDates[0]}
           onTimeChange={handleStartTimeChange}
