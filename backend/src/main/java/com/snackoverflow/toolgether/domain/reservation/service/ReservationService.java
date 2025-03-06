@@ -2,6 +2,8 @@ package com.snackoverflow.toolgether.domain.reservation.service;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,7 +66,7 @@ public class ReservationService {
 			.build();
 
 		depositHistoryService.createDepositHistory(depositHistory);
-		return new ReservationResponse(reservation.getId(), reservation.getStatus().name(), reservation.getAmount());
+		return new ReservationResponse(reservation.getId(), reservation.getStatus().name(), reservation.getPost().getId(), reservation.getStartTime(), reservation.getEndTime(), reservation.getAmount());
 	}
 
 	// 예약 승인
@@ -128,6 +130,19 @@ public class ReservationService {
 			// 소유자 크레딧 업데이트
 			userService.updateUserCredit(reservation.getOwner().getId(), depositHistory.getAmount());
 		}
+	}
+
+	// 예약 ID로 예약 조회
+	public ReservationResponse getReservationById(Long reservationId) {
+		Reservation reservation = findReservationByIdOrThrow(reservationId);
+		return new ReservationResponse(
+			reservation.getId(),
+			reservation.getStatus().name(),
+			reservation.getPost().getId(),
+			reservation.getStartTime(),
+			reservation.getEndTime(),
+			reservation.getAmount()
+		);
 	}
 
 	// 예외 처리 포함 예약 조회 메서드
