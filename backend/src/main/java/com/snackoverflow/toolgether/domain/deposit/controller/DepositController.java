@@ -23,7 +23,7 @@ public class DepositController {
 		DepositHistory depositHistory = depositService.findDepositHistoryByReservationId(id);
 		return new RsData<>(
 			"200-1",
-			"%번 예약의 보증금 내역이 조회되었습니다.",
+			"%d번 예약의 보증금 내역이 조회되었습니다.".formatted(id),
 			new DepositResponse(
 				depositHistory.getId(),
 				depositHistory.getStatus().toString(),
