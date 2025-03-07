@@ -117,5 +117,16 @@ public class MypageController {
     }
 
     //회원 탈퇴
-
+    @DeleteMapping("/me")
+    public RsData<Void> DeleteMe(
+            @Login CustomUserDetails customUserDetails
+    ) {
+        String username = customUserDetails.getUsername();
+        User user = userService.findByUsername(username);
+        userService.deleteUser(user);
+        return new RsData<>(
+                "200-1",
+                "회원 탈퇴가 완료되었습니다."
+        );
+    }
 }

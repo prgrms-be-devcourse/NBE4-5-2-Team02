@@ -143,4 +143,10 @@ public class UserService {
         user.updateLocation(request.getLatitude(), request.getLongitude());
         userRepository.save(user);
     }
+
+    @Transactional
+    public void deleteUser(User user) {
+        user.delete();
+        userRepository.save(user);
+    }
 }

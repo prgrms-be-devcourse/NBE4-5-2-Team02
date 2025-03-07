@@ -2,6 +2,7 @@ package com.snackoverflow.toolgether;
 
 import com.snackoverflow.toolgether.domain.post.entity.Post;
 import com.snackoverflow.toolgether.domain.postimage.service.PostImageService;
+import com.snackoverflow.toolgether.domain.reservation.dto.ReservationRequest;
 import com.snackoverflow.toolgether.domain.reservation.entity.Reservation;
 import com.snackoverflow.toolgether.domain.reservation.entity.ReservationStatus;
 import com.snackoverflow.toolgether.domain.reservation.service.ReservationService;
@@ -39,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -210,7 +212,6 @@ public class MypageControllerTest {
 				latitude
 		).stripIndent();
 
-		// When
 		ResultActions resultActions = mockMvc
 				.perform(
 						patch("/api/v1/mypage/me")
@@ -221,10 +222,26 @@ public class MypageControllerTest {
 				)
 				.andDo(print());
 
-		// Then
 		resultActions
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.code").value("200-1"))
 				.andExpect(jsonPath("$.msg").value("내 정보 수정 성공"));
+
+		verify(userService, times(1)).updateMyInfo(any(), any());
+
+	}
+
+	@Test
+	@DisplayName("회원 탈퇴")
+	void testDeleteMe() throws Exception {
+
+		ResultActions resultActions = mockMvc.perform(delete("/api/v1/mypage/me"))
+				.andDo(print());
+
+		resultActions
+				.andExpect(status().isOk());
+
+		verify(userService, times(1)).deleteUser(any());
+
 	}
 }
