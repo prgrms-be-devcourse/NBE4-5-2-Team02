@@ -63,6 +63,7 @@ public class ReservationService {
 			.user(reservation.getRenter()) // 보증금은 대여자가 지불
 			.amount(reservationRequest.deposit().intValue())
 			.status(DepositStatus.PENDING)
+			.returnReason(ReturnReason.NONE)
 			.build();
 
 		depositHistoryService.createDepositHistory(depositHistory);
