@@ -47,16 +47,15 @@ public class PostController {
         );
     }
 
+    //    @Operation(summary = "게시물 수정")
     @PutMapping("/{postId}")
     public RsData<PostResponse> updatePost(
             @PathVariable Long postId,
             @RequestBody @Valid PostUpdateRequest request) {
-
-        PostResponse updatedPost = postService.updatePost(postId, request);
         return new RsData<>(
                 "200-2",
                 "게시물이 성공적으로 수정되었습니다.",
-                updatedPost
+                postService.updatePost(postId, request)
         );
     }
 }
