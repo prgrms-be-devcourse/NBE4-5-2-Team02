@@ -59,10 +59,40 @@ export default function ClientPage({
   const [dateRange, setDateRange] = useState<Date[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [usageDuration, setUsageDuration] = useState<string>("");
+  const [reservedDates, setReservedDates] = useState<Date[]>([]);
 
   useEffect(() => {
     calculateTotalPrice(dateRange);
   }, [startTime, endTime, dateRange]);
+
+  useEffect(() => {
+    const loadReservedDates = async () => {
+      const dates = await fetchReservedDates(me.id);
+      setReservedDates(dates);
+    };
+    loadReservedDates();
+  }, [me.id]);
+
+  // 예약된 날짜 가져오기
+  const fetchReservedDates = async (userId: number) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/v1/reservations/reservatedDates/${userId}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        return data.data.map((dateString: string) =>
+          moment(dateString).toDate()
+        );
+      } else {
+        console.error("Failed to fetch reserved dates");
+        return [];
+      }
+    } catch (error) {
+      console.error("Error fetching reserved dates:", error);
+      return [];
+    }
+  };
 
   const handleNavigate = (newDate: Date) => {
     setDate(newDate);
@@ -143,9 +173,25 @@ export default function ClientPage({
     }
   };
 
-  // 캘린더 슬롯 선택
+  // 캘린더 슬롯 선택 - 이미 예약된 날짜는 선택 불가능
   const handleSelectSlot = ({ start, end }: SlotInfo) => {
     const correctedEnd = moment(end).subtract(1, "day").toDate();
+    const range: Date[] = [];
+    let current = moment(start);
+
+    while (current.isSameOrBefore(moment(correctedEnd), "day")) {
+      if (
+        reservedDates.some((reservedDate) =>
+          current.isSame(moment(reservedDate), "day")
+        )
+      ) {
+        alert("선택하신 날짜는 이미 예약되어 있습니다.");
+        return;
+      }
+      range.push(current.clone().toDate());
+      current.add(1, "day");
+    }
+
     setSelectedDates([start, correctedEnd]);
     calculateDateRange([start, correctedEnd]);
     setShowTimeForm(true);
@@ -157,6 +203,18 @@ export default function ClientPage({
       return {
         style: {
           backgroundColor: "lightblue",
+        },
+      };
+    }
+    if (
+      reservedDates.some((reservedDate) =>
+        moment(reservedDate).isSame(date, "day")
+      )
+    ) {
+      return {
+        style: {
+          backgroundColor: "lightgreen",
+          pointerEvents: "none", // 선택 불가능하게 설정
         },
       };
     }

@@ -1,5 +1,8 @@
 package com.snackoverflow.toolgether.domain.reservation.controller;
 
+import java.time.LocalDate;
+import java.util.Set;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +36,7 @@ public class ReservationController {
 	@PatchMapping("/{id}/approve")
 	public RsData<Void> approveReservation(@PathVariable Long id) {
 		reservationService.approveReservation(id);
-		return new RsData<>("200-1",
+		return new RsData<>("201-1",
 			"%d번 예약 승인 성공".formatted(id));
 	}
 
@@ -78,6 +81,16 @@ public class ReservationController {
 		return new RsData<>("200-1",
 			"%d번 예약 조회 성공".formatted(id),
 			response
+		);
+	}
+
+	@GetMapping("/reservatedDates/{id}")
+	public RsData<Set<LocalDate>> getReservedDates(@PathVariable Long id) {
+		Set<LocalDate> reservationDates = reservationService.getDateListByUserId(id);
+		return new RsData<>(
+			"200-1",
+			"%d번 유저의 예약 일정 조회 성공".formatted(id),
+			reservationDates
 		);
 	}
 }

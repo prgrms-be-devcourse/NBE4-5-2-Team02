@@ -5,6 +5,7 @@ import com.snackoverflow.toolgether.domain.reservation.entity.ReservationStatus;
 import com.snackoverflow.toolgether.domain.reservation.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import java.net.URI;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,14 +28,19 @@ import com.snackoverflow.toolgether.domain.reservation.entity.Reservation;
 import com.snackoverflow.toolgether.domain.reservation.entity.ReservationStatus;
 import com.snackoverflow.toolgether.domain.reservation.repository.ReservationRepository;
 import com.snackoverflow.toolgether.domain.user.service.UserService;
+import com.snackoverflow.toolgether.global.exception.ServiceException;
 import com.snackoverflow.toolgether.global.exception.custom.ErrorResponse;
 import com.snackoverflow.toolgether.global.exception.custom.CustomException;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -163,6 +169,33 @@ public class ReservationService {
 				.detail("해당 ID의 예약을 찾을 수 없습니다.")
 				.instance(URI.create(ServletUriComponentsBuilder.fromCurrentRequestUri().toUriString()))
 				.build()));
+	}
+
+	// 해당 유저의 예약 날짜 조회
+	@Transactional(readOnly = true)
+	public Set<LocalDate> getDateListByUserId(Long userId) {
+		List<Reservation> ownerReservations = reservationRepository.findByOwnerId(userId);
+		List<Reservation> renterReservations = reservationRepository.findByRenterId(userId);
+
+		if (ownerReservations.isEmpty() && renterReservations.isEmpty()){
+			throw new ServiceException("404-1", "해당 유저의 예약 정보가 없습니다.");
+		}
+		
+		return Stream.concat(ownerReservations.stream(), renterReservations.stream())
+			.flatMap(reservation -> getDatesBetween(reservation.getStartTime().toLocalDate(), reservation.getEndTime().toLocalDate()).stream())
+			.collect(java.util.stream.Collectors.toCollection(HashSet::new));
+	}
+
+	// 사이 날짜 계산 함수
+	public Set<LocalDate> getDatesBetween(LocalDate startDate, LocalDate endDate) {
+		Set<LocalDate> dates = new HashSet<>();
+		LocalDate currentDate = startDate;
+
+		while (!currentDate.isAfter(endDate)) {
+			dates.add(currentDate);
+			currentDate = currentDate.plusDays(1);
+		}
+		return dates;
 	}
 
     // 렌탈 예약 정보 DB에서 조회
