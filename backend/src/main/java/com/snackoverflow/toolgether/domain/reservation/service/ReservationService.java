@@ -24,22 +24,13 @@ import com.snackoverflow.toolgether.domain.reservation.entity.FailDue;
 import com.snackoverflow.toolgether.domain.user.entity.User;
 import com.snackoverflow.toolgether.domain.reservation.dto.ReservationRequest;
 import com.snackoverflow.toolgether.domain.reservation.dto.ReservationResponse;
-import com.snackoverflow.toolgether.domain.reservation.entity.Reservation;
-import com.snackoverflow.toolgether.domain.reservation.entity.ReservationStatus;
-import com.snackoverflow.toolgether.domain.reservation.repository.ReservationRepository;
 import com.snackoverflow.toolgether.domain.user.service.UserService;
 import com.snackoverflow.toolgether.global.exception.ServiceException;
 import com.snackoverflow.toolgether.global.exception.custom.ErrorResponse;
 import com.snackoverflow.toolgether.global.exception.custom.CustomException;
 
-import lombok.RequiredArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
