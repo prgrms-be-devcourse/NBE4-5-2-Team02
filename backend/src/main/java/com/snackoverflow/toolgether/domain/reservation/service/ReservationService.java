@@ -180,10 +180,26 @@ public class ReservationService {
 		if (ownerReservations.isEmpty() && renterReservations.isEmpty()){
 			throw new ServiceException("404-1", "해당 유저의 예약 정보가 없습니다.");
 		}
-		
-		return Stream.concat(ownerReservations.stream(), renterReservations.stream())
+
+		// 거절, 완료, 실패 상태의 경우 필터링
+		List<ReservationStatus> excludedStatuses = List.of(
+			ReservationStatus.REJECTED,
+			ReservationStatus.DONE,
+			ReservationStatus.FAILED_OWNER_ISSUE,
+			ReservationStatus.FAILED_RENTER_ISSUE
+		);
+
+		List<Reservation> filteredOwnerReservations = ownerReservations.stream()
+			.filter(reservation -> !excludedStatuses.contains(reservation.getStatus()))
+			.toList();
+
+		List<Reservation> filteredRenterReservations = renterReservations.stream()
+			.filter(reservation -> !excludedStatuses.contains(reservation.getStatus()))
+			.toList();
+
+		return Stream.concat(filteredOwnerReservations.stream(), filteredRenterReservations.stream())
 			.flatMap(reservation -> getDatesBetween(reservation.getStartTime().toLocalDate(), reservation.getEndTime().toLocalDate()).stream())
-			.collect(java.util.stream.Collectors.toCollection(HashSet::new));
+			.collect(Collectors.toCollection(HashSet::new));
 	}
 
 	// 사이 날짜 계산 함수
