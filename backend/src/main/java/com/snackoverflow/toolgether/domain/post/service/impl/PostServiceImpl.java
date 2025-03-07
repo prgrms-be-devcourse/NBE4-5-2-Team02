@@ -1,10 +1,13 @@
 package com.snackoverflow.toolgether.domain.post.service.impl;
 
 import com.snackoverflow.toolgether.domain.post.dto.PostUpdateRequest;
+import com.snackoverflow.toolgether.domain.post.entity.enums.RecurrenceDays;
+import com.snackoverflow.toolgether.domain.postavailability.dto.PostAvailabilityRequest;
 import com.snackoverflow.toolgether.domain.postavailability.entity.PostAvailability;
 import com.snackoverflow.toolgether.domain.postavailability.repository.PostAvailabilityRepository;
 import com.snackoverflow.toolgether.domain.postimage.entity.PostImage;
 import com.snackoverflow.toolgether.domain.postimage.repository.PostImageRepository;
+import com.snackoverflow.toolgether.domain.user.repository.UserRepository;
 import com.snackoverflow.toolgether.global.exception.BadRequestException;
 import com.snackoverflow.toolgether.global.exception.NotFoundException;
 import com.snackoverflow.toolgether.domain.post.dto.PostCreateRequest;
@@ -33,7 +36,7 @@ public class PostServiceImpl implements PostService {
     public PostResponse createPost(PostCreateRequest request) {
         // 임시로 user_id=1 사용 (실제 로직에서는 인증된 사용자 정보 가져오기)
         User user = userRepository.findById(1L)
-                .orElseThrow(() -> new new NotFoundException("404-1", "사용자를 찾을 수 없습니다.");
+                .orElseThrow(() -> new NotFoundException("404-1", "사용자를 찾을 수 없습니다."));
 
         if (request.getTitle() == null || request.getTitle().isBlank()) {
             throw new BadRequestException("400-1", "제목은 필수 입력값입니다.");
@@ -64,18 +67,7 @@ public class PostServiceImpl implements PostService {
         postImageRepository.saveAll(images);
 
         // 거래 가능 일정 저장
-        List<PostAvailability> availabilities = request.getAvailabilities().stream()
-                .map(availability -> PostAvailability.builder()
-                        .post(post)
-                        .date(availability.getDate())
-                        .recurrence_days(availability.getRecurrenceDays() != null ? availability.getRecurrenceDays() : null)
-                        .startTime(availability.getStartTime())
-                        .endTime(availability.getEndTime())
-                        .isRecurring(availability.isRecurring())
-                        .build())
-                .toList();
-
-        postAvailabilityRepository.saveAll(availabilities);
+        savePostAvailabilities(post, request.getAvailabilities());
 
         return new PostResponse(post);
     }
@@ -147,17 +139,7 @@ public class PostServiceImpl implements PostService {
         // 기존 거래 가능 일정 삭제 후 새로운 일정 저장
         postAvailabilityRepository.deleteByPostId(postId);
         if (request.getAvailabilities() != null && !request.getAvailabilities().isEmpty()) {
-            List<PostAvailability> availabilities = request.getAvailabilities().stream()
-                    .map(availability -> PostAvailability.builder()
-                            .post(post)
-                            .date(availability.getDate())
-                            .recurrence_days(availability.getRecurrenceDays())
-                            .startTime(availability.getStartTime())
-                            .endTime(availability.getEndTime())
-                            .isRecurring(availability.isRecurring())
-                            .build())
-                    .toList();
-            postAvailabilityRepository.saveAll(availabilities);
+            savePostAvailabilities(post, request.getAvailabilities());
         }
 
         // 수정된 게시물 반환
@@ -169,6 +151,28 @@ public class PostServiceImpl implements PostService {
         List<PostAvailability> availabilities = postAvailabilityRepository.findAllByPostId(postId);
 
         return new PostResponse(post, imageUrls, availabilities);
+    }
+
+    private void savePostAvailabilities(Post post, List<PostAvailabilityRequest> availabilities) {
+        List<PostAvailability> postAvailabilities = availabilities.stream()
+                .map(availability -> PostAvailability.builder()
+                        .post(post)
+                        .date(availability.getDate())
+                        .recurrence_days(availability.getRecurrenceDays() != null ? availability.getRecurrenceDays() : RecurrenceDays.NONE.getCode())
+                        .startTime(availability.getStartTime())
+                        .endTime(availability.getEndTime())
+                        .isRecurring(availability.isRecurring())
+                        .build())
+                .toList();
+        postAvailabilityRepository.saveAll(postAvailabilities);
+    }
+
+    // 예약에 필요한 메서드
+    @Transactional(readOnly = true)
+    @Override
+    public Post findPostById(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
     }
 
 }
