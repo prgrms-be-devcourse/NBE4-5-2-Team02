@@ -72,7 +72,16 @@ public class ReservationService {
 			.build();
 
 		depositHistoryService.createDepositHistory(depositHistory);
-		return new ReservationResponse(reservation.getId(), reservation.getStatus().name(), reservation.getPost().getId(), reservation.getStartTime(), reservation.getEndTime(), reservation.getAmount());
+		return new ReservationResponse(reservation.getId(),
+			reservation.getStatus().name(),
+			reservation.getPost().getId(),
+			reservation.getStartTime(),
+			reservation.getEndTime(),
+			reservation.getAmount(),
+			reservation.getRejectionReason(),
+			reservation.getOwner().getId(),
+			reservation.getRenter().getId()
+		);
 	}
 
 	// 예약 승인
@@ -147,7 +156,10 @@ public class ReservationService {
 			reservation.getPost().getId(),
 			reservation.getStartTime(),
 			reservation.getEndTime(),
-			reservation.getAmount()
+			reservation.getAmount(),
+			reservation.getRejectionReason(),
+			reservation.getOwner().getId(),
+			reservation.getRenter().getId()
 		);
 	}
 
@@ -166,10 +178,6 @@ public class ReservationService {
 	@Transactional(readOnly = true)
 	public Set<LocalDate> getDateListByPostId(Long postId) {
 		List<Reservation> postReservations = reservationRepository.findByPostId(postId);
-
-		if (postReservations.isEmpty()){
-			throw new ServiceException("404-1", "해당 게시글의 예약 정보가 없습니다.");
-		}
 
 		// 요청, 거절, 완료, 실패 상태의 경우 필터링
 		List<ReservationStatus> excludedStatuses = List.of(
