@@ -1,5 +1,9 @@
 package com.snackoverflow.toolgether.domain.reservation.service;
 
+import com.snackoverflow.toolgether.domain.reservation.entity.Reservation;
+import com.snackoverflow.toolgether.domain.reservation.entity.ReservationStatus;
+import com.snackoverflow.toolgether.domain.reservation.repository.ReservationRepository;
+import lombok.RequiredArgsConstructor;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +31,10 @@ import com.snackoverflow.toolgether.global.exception.custom.ErrorResponse;
 import com.snackoverflow.toolgether.global.exception.custom.CustomException;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -156,4 +164,16 @@ public class ReservationService {
 				.instance(URI.create(ServletUriComponentsBuilder.fromCurrentRequestUri().toUriString()))
 				.build()));
 	}
+
+    // 렌탈 예약 정보 DB에서 조회
+    @Transactional(readOnly = true)
+    public List<Reservation> getRentalReservations(Long userId) {
+        return reservationRepository.findByOwnerId(userId);
+    }
+
+    // 대여 예약 정보 DB에서 조회
+    @Transactional(readOnly = true)
+    public List<Reservation> getBorrowReservations(Long userId) {
+        return reservationRepository.findByRenterId(userId);
+    }
 }
