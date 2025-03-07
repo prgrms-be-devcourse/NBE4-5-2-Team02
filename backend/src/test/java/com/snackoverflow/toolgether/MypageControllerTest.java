@@ -7,11 +7,12 @@ import com.snackoverflow.toolgether.domain.reservation.entity.ReservationStatus;
 import com.snackoverflow.toolgether.domain.reservation.service.ReservationService;
 import com.snackoverflow.toolgether.domain.review.service.ReviewService;
 import com.snackoverflow.toolgether.domain.user.controller.MypageController;
-import com.snackoverflow.toolgether.domain.user.dto.AddressInfo;
 import com.snackoverflow.toolgether.domain.user.dto.MeInfoResponse;
 import com.snackoverflow.toolgether.domain.user.dto.MyReservationInfoResponse;
+import com.snackoverflow.toolgether.domain.user.dto.request.PatchMyInfoRequest;
 import com.snackoverflow.toolgether.domain.user.entity.Address;
 import com.snackoverflow.toolgether.domain.user.entity.User;
+import com.snackoverflow.toolgether.domain.user.repository.UserRepository;
 import com.snackoverflow.toolgether.domain.user.service.UserService;
 import com.snackoverflow.toolgether.global.dto.RsData;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,10 +21,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,8 +35,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -165,5 +171,60 @@ public class MypageControllerTest {
 
 		verify(reservationService, times(1)).getRentalReservations(2L);
 		verify(reservationService, times(1)).getBorrowReservations(2L);
+	}
+
+	@Test
+	@DisplayName("내 정보 수정")
+	void testPatchMyInfo() throws Exception {
+
+		String modifiedEmail = "modifiedMail123@gmail.com";
+		String modifiedNickname = "수정된닉네임";
+		String modifiedPhoneNumber = "01012345678";
+		String mainAddress = "수정시 수정구";
+		String detailAddress = "수정동 123-45";
+		String zipcode = "12345";
+		String longitude = "122.2222";
+		String latitude = "44.4444";
+
+		String requestBody = """
+                {
+                    "email": "%s",
+                    "phoneNumber": "%s",
+                    "nickname": "%s",
+                    "address": {
+                        "mainAddress": "%s",
+                        "detailAddress": "%s",
+                        "zipcode": "%s"
+                    },
+                    "longitude": "%s",
+                    "latitude": "%s"
+                }
+                """.formatted(
+				modifiedEmail,
+				modifiedPhoneNumber,
+				modifiedNickname,
+				mainAddress,
+				detailAddress,
+				zipcode,
+				longitude,
+				latitude
+		).stripIndent();
+
+		// When
+		ResultActions resultActions = mockMvc
+				.perform(
+						patch("/api/v1/mypage/me")
+								.content(requestBody)
+								.contentType(
+										new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)
+								)
+				)
+				.andDo(print());
+
+		// Then
+		resultActions
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.code").value("200-1"))
+				.andExpect(jsonPath("$.msg").value("내 정보 수정 성공"));
 	}
 }

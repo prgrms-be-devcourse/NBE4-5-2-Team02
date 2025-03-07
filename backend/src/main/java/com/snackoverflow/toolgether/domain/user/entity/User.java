@@ -1,5 +1,6 @@
 package com.snackoverflow.toolgether.domain.user.entity;
 
+import com.snackoverflow.toolgether.domain.user.dto.request.PatchMyInfoRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -94,5 +95,17 @@ public class User {
                 .mainAddress(mainAddress)
                 .detailAddress(detailAddress)
                 .build();
+    }
+
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateAddress(Address address) {
+        this.address = address;
     }
 }
