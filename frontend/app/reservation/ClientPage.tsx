@@ -67,17 +67,17 @@ export default function ClientPage({
 
   useEffect(() => {
     const loadReservedDates = async () => {
-      const dates = await fetchReservedDates(me.id);
+      const dates = await fetchReservedDates(post.id);
       setReservedDates(dates);
     };
     loadReservedDates();
   }, [me.id]);
 
   // 예약된 날짜 가져오기
-  const fetchReservedDates = async (userId: number) => {
+  const fetchReservedDates = async (postId: number) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/v1/reservations/reservatedDates/${userId}`
+        `http://localhost:8080/api/v1/reservations/reservatedDates/${postId}`
       );
       if (response.ok) {
         const data = await response.json();

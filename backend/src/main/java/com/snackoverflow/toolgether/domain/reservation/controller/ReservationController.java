@@ -86,10 +86,10 @@ public class ReservationController {
 
 	@GetMapping("/reservatedDates/{id}")
 	public RsData<Set<LocalDate>> getReservedDates(@PathVariable Long id) {
-		Set<LocalDate> reservationDates = reservationService.getDateListByUserId(id);
+		Set<LocalDate> reservationDates = reservationService.getDateListByPostId(id);
 		return new RsData<>(
 			"200-1",
-			"%d번 유저의 예약 일정 조회 성공".formatted(id),
+			"%d번 게시글의 예약 일정 조회 성공".formatted(id),
 			reservationDates
 		);
 	}

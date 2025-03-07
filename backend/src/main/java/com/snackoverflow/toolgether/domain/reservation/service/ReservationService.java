@@ -162,33 +162,26 @@ public class ReservationService {
 				.build()));
 	}
 
-	// 해당 유저의 예약 날짜 조회
+	// 해당 포스트의 예약 날짜 조회
 	@Transactional(readOnly = true)
-	public Set<LocalDate> getDateListByUserId(Long userId) {
-		List<Reservation> ownerReservations = reservationRepository.findByOwnerId(userId);
-		List<Reservation> renterReservations = reservationRepository.findByRenterId(userId);
+	public Set<LocalDate> getDateListByPostId(Long postId) {
+		List<Reservation> postReservations = reservationRepository.findByPostId(postId);
 
-		if (ownerReservations.isEmpty() && renterReservations.isEmpty()){
-			throw new ServiceException("404-1", "해당 유저의 예약 정보가 없습니다.");
+		if (postReservations.isEmpty()){
+			throw new ServiceException("404-1", "해당 게시글의 예약 정보가 없습니다.");
 		}
 
-		// 거절, 완료, 실패 상태의 경우 필터링
+		// 요청, 거절, 완료, 실패 상태의 경우 필터링
 		List<ReservationStatus> excludedStatuses = List.of(
-			ReservationStatus.REJECTED,
-			ReservationStatus.DONE,
-			ReservationStatus.FAILED_OWNER_ISSUE,
-			ReservationStatus.FAILED_RENTER_ISSUE
+			ReservationStatus.APPROVED,
+			ReservationStatus.IN_PROGRESS
 		);
 
-		List<Reservation> filteredOwnerReservations = ownerReservations.stream()
-			.filter(reservation -> !excludedStatuses.contains(reservation.getStatus()))
+		List<Reservation> filteredPostReservations = postReservations.stream()
+			.filter(reservation -> excludedStatuses.contains(reservation.getStatus()))
 			.toList();
 
-		List<Reservation> filteredRenterReservations = renterReservations.stream()
-			.filter(reservation -> !excludedStatuses.contains(reservation.getStatus()))
-			.toList();
-
-		return Stream.concat(filteredOwnerReservations.stream(), filteredRenterReservations.stream())
+		return filteredPostReservations.stream()
 			.flatMap(reservation -> getDatesBetween(reservation.getStartTime().toLocalDate(), reservation.getEndTime().toLocalDate()).stream())
 			.collect(Collectors.toCollection(HashSet::new));
 	}
