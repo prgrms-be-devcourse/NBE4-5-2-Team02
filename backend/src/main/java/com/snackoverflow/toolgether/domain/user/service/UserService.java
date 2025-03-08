@@ -154,7 +154,7 @@ public class UserService {
         user.updateEmail(request.getEmail());
         user.updatePhoneNumber(request.getPhoneNumber());
         user.updateNickname(request.getNickname());
-        user.updateAddress(request.getAddress());
+        user.updateAddress(request.getAddress().getMainAddress(), request.getAddress().getDetailAddress(), request.getAddress().getZipcode());
         user.updateLocation(request.getLatitude(), request.getLongitude());
         userRepository.save(user);
     }

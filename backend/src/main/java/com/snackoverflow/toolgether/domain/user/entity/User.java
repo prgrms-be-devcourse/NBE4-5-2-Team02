@@ -97,13 +97,13 @@ public class User {
         this.additionalInfoRequired = additionalInfoRequired;
     }
 
-//    public void updateAddress(String zipcode, String mainAddress, String detailAddress) {
-//        this.address = Address.builder()
-//                .zipcode(zipcode)
-//                .mainAddress(mainAddress)
-//                .detailAddress(detailAddress)
-//                .build();
-//    }
+    public void updateAddress(String zipcode, String mainAddress, String detailAddress) {
+        this.address = Address.builder()
+                .zipcode(zipcode)
+                .mainAddress(mainAddress)
+                .detailAddress(detailAddress)
+                .build();
+    }
 
     public void updateEmail(String email) {
         this.email = email;
@@ -112,11 +112,6 @@ public class User {
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
-
-    public void updateAddress(Address address) {
-        this.address = address;
-    }
-
 
     public void updateProfileImage(String uuid) {
         this.profileImage = uuid;
