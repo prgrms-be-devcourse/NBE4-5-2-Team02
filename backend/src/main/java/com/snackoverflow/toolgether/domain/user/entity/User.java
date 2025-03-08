@@ -1,7 +1,6 @@
 package com.snackoverflow.toolgether.domain.user.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
