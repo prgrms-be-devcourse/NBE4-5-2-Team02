@@ -8,11 +8,13 @@ import com.snackoverflow.toolgether.domain.review.service.ReviewService;
 import com.snackoverflow.toolgether.domain.user.dto.MeInfoResponse;
 import com.snackoverflow.toolgether.domain.user.dto.MyReservationInfoResponse;
 import com.snackoverflow.toolgether.domain.user.dto.request.PatchMyInfoRequest;
+import com.snackoverflow.toolgether.domain.user.dto.request.ProfileRequest;
 import com.snackoverflow.toolgether.domain.user.entity.User;
 import com.snackoverflow.toolgether.domain.user.service.UserService;
 import com.snackoverflow.toolgether.global.dto.RsData;
 import com.snackoverflow.toolgether.global.filter.CustomUserDetails;
 import com.snackoverflow.toolgether.global.filter.Login;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -96,6 +98,35 @@ public class MypageController {
                 "200-1",
                 "마이페이지 예약 정보 조회 성공",
                 data
+        );
+    }
+
+    //프로필 이미지 업로드
+    @PostMapping("/profile")
+    public RsData<Void> postProfileimage(
+            @Login CustomUserDetails customUserDetails,
+            @RequestBody @NotNull @Validated ProfileRequest profileRequest
+    ) {
+        String username = customUserDetails.getUsername();
+        User user = userService.findByUsername(username);
+        userService.postProfileImage(user, profileRequest.getUuid());
+        return new RsData<>(
+                "200-1",
+                "프로필 이미지 업로드가 완료되었습니다"
+        );
+    }
+
+    //프로필 이미지 삭제
+    @DeleteMapping("/profile")
+    public RsData<Void> deleteProfileImage(
+            @Login CustomUserDetails customUserDetails
+    ) {
+        String username = customUserDetails.getUsername();
+        User user = userService.findByUsername(username);
+        userService.deleteProfileImage(user);
+        return new RsData<>(
+                "200-1",
+                "프로필 이미지 삭제가 완료되었습니다"
         );
     }
 

@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -116,6 +117,22 @@ public class MypageControllerTest {
 				.nickname("닉네임1")
 				.email("test1@gmail.com")
 				.phoneNumber("000-0000-0001")
+				.address( Address.builder()
+						.mainAddress("서울시 강남구")
+						.detailAddress("역삼동 123-45")
+						.zipcode("12345")
+						.build())
+				.createdAt(LocalDateTime.now())
+				.score(30)
+				.credit(0)
+				.build();
+
+		User user2 = User.builder()
+				.id(1L)
+				.username("testId1")
+				.nickname("닉네임1")
+				.email("test1@gmail.com")
+				.phoneNumber("000-0000-0001")
 				.address(Address.builder()
 						.mainAddress("서울시 강남구")
 						.detailAddress("역삼동 123-45")
@@ -125,15 +142,16 @@ public class MypageControllerTest {
 				.score(30)
 				.credit(0)
 				.build();
-		Post post1 = Post.builder()
+
+		Post post = Post.builder()
 				.id(10L)
 				.title("Sample Post Title")
 				.build();
-		Reservation reservation1 = Reservation.builder()
-				.id(1L)
-				.post(post1)
+		Reservation reservation = Reservation.builder()
+				.id(2L)
+				.post(post)
 				.renter(user1)
-				.owner(user1)
+				.owner(user2)
 				.createAt(LocalDateTime.now())
 				.startTime(LocalDateTime.now())
 				.endTime(LocalDateTime.now().plusHours(1))
@@ -141,24 +159,12 @@ public class MypageControllerTest {
 				.amount(10000.0)
 				.build();
 
-		MyReservationInfoResponse myReservationInfoResponse = MyReservationInfoResponse.from(reservation1, "imageUrl", false);
-
 		List<Reservation> rentals = new ArrayList<>();
-		rentals.add(reservation1);
+		rentals.add(reservation);
 
-		List<MyReservationInfoResponse> rentalResponses = new ArrayList<>();
-		rentalResponses.add(myReservationInfoResponse);
+		when(reservationService.getRentalReservations(1L)).thenReturn(rentals);
+		when(reservationService.getBorrowReservations(1L)).thenReturn(new ArrayList<>());
 
-		Map<String, List<MyReservationInfoResponse>> data = new HashMap<>();
-		data.put("rentals", rentalResponses);
-		data.put("borrows", new ArrayList<>());
-
-		RsData<Map<String, List<MyReservationInfoResponse>>> rsData = new RsData<>("200-1", "마이페이지 예약 정보 조회 성공", data);
-
-
-		when(reservationService.getRentalReservations(2L)).thenReturn(rentals);
-		when(reservationService.getBorrowReservations(2L)).thenReturn(new ArrayList<>());
-		when(postImageService.getPostImagesByPostId(any())).thenReturn(new ArrayList<>());
 		when(reviewService.findByUserIdAndReservationId(anyLong(), anyLong())).thenReturn(Optional.empty());
 
 		ResultActions resultActions = mockMvc.perform(get("/api/v1/mypage/reservations"))
@@ -171,7 +177,7 @@ public class MypageControllerTest {
 				.andExpect(jsonPath("$.data.rentals[0].title").value("Sample Post Title"))
 				.andExpect(jsonPath("$.data.borrows").isEmpty());
 
-		verify(reservationService, times(1)).getRentalReservations(2L);
+		verify(reservationService, times(1)).getRentalReservations(1L);
 		verify(reservationService, times(1)).getBorrowReservations(2L);
 	}
 
@@ -242,6 +248,40 @@ public class MypageControllerTest {
 				.andExpect(status().isOk());
 
 		verify(userService, times(1)).deleteUser(any());
+	}
 
+	@Test
+	@DisplayName("프로필 이미지 등록")
+	public void testPatchProfileImage() throws Exception {
+		String requestBody = """
+                {
+                    "uuid": "%s"
+                }
+                """.formatted(
+				"testprofile"
+		).stripIndent();
+		ResultActions resultActions = mockMvc.perform(post("/api/v1/mypage/profile")
+				.content(requestBody)
+				.contentType(
+						new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)
+				))
+				.andDo(print());
+
+		resultActions
+				.andExpect(status().isOk());
+
+		verify(userService, times(1)).postProfileImage(any(), any());
+	}
+
+	@Test
+	@DisplayName("프로필 이미지 삭제")
+	public void testDeleteProfileImage() throws Exception {
+		ResultActions resultActions = mockMvc.perform(delete("/api/v1/mypage/profile"))
+				.andDo(print());
+
+		resultActions
+				.andExpect(status().isOk());
+
+		verify(userService, times(1)).deleteProfileImage(any());
 	}
 }

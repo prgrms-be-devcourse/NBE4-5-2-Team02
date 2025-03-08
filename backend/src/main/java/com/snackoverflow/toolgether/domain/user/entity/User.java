@@ -118,6 +118,14 @@ public class User {
     }
 
 
+    public void updateProfileImage(String uuid) {
+        this.profileImage = uuid;
+    }
+
+    public void deleteProfileImage() {
+        this.profileImage = null;
+    }
+
     //탈퇴시 호출, 삭제 시간을 기록하고 익명화 진행
     @PreUpdate
     public void preUpdate() {

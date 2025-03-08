@@ -1,5 +1,6 @@
 package com.snackoverflow.toolgether.domain.user.service;
 
+import com.snackoverflow.toolgether.domain.postimage.entity.PostImage;
 import com.snackoverflow.toolgether.domain.user.dto.request.PatchMyInfoRequest;
 import org.springframework.transaction.annotation.Transactional;
 import com.snackoverflow.toolgether.domain.user.dto.MeInfoResponse;
@@ -132,6 +133,20 @@ public class UserService {
         return userRepository.findByUsername(username).orElseThrow(
                 () -> new ServiceException("404-1", "해당 유저를 찾을 수 없습니다")
         );
+    }
+
+    @Transactional
+    public void postProfileImage(User user, String uuid) {
+        user.updateProfileImage(uuid);
+        userRepository.save(user);
+
+    }
+
+    @Transactional
+    public void deleteProfileImage(User user) {
+        user.deleteProfileImage();
+        userRepository.save(user);
+
     }
 
     @Transactional
