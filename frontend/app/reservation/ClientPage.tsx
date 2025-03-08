@@ -70,6 +70,7 @@ export default function ClientPage({
     const loadReservedEvents = async () => {
       const events = await fetchReservedEvents(post.id);
       setEvents(events);
+      processReservedEvents(events);
     };
     loadReservedEvents();
   }, [me.id, post.id]);
@@ -83,7 +84,7 @@ export default function ClientPage({
       if (response.ok) {
         const data = await response.json();
         return data.data.map((reservation: any) => ({
-          title: `예약 (${reservation.status})`,
+          title: `예약중`,
           start: moment(reservation.startTime).toDate(),
           end: moment(reservation.endTime).toDate(),
           allDay: false,
@@ -96,6 +97,20 @@ export default function ClientPage({
       console.error("Error fetching reserved events:", error);
       return [];
     }
+  };
+
+  const processReservedEvents = (events: any[]) => {
+    const dates: Date[] = [];
+    events.forEach((event) => {
+      let currentDate = moment(event.start).clone();
+      const endDate = moment(event.end).clone();
+
+      while (currentDate.isSameOrBefore(endDate, "day")) {
+        dates.push(currentDate.clone().toDate());
+        currentDate.add(1, "day");
+      }
+    });
+    setReservedDates(dates);
   };
 
   const handleNavigate = (newDate: Date) => {
@@ -181,17 +196,17 @@ export default function ClientPage({
   const handleSelectSlot = ({ start, end }: SlotInfo) => {
     const correctedEnd = moment(end).subtract(1, "day").toDate();
     const range: Date[] = [];
-    let current = moment(start);
+    let current = moment(start).clone();
 
     while (current.isSameOrBefore(moment(correctedEnd), "day")) {
       if (
         reservedDates.some((reservedDate) =>
           current.isSame(moment(reservedDate), "day")
-        ) ||
-        events.some(
+        ) &&
+        !events.some(
           (event) =>
-            moment(current).isSameOrAfter(moment(event.start)) &&
-            moment(current).isBefore(moment(event.end))
+            current.isSame(moment(event.start), "day") ||
+            current.isSame(moment(event.end), "day")
         )
       ) {
         alert("선택하신 날짜는 이미 예약되어 있거나 예약된 기간을 포함합니다.");
@@ -224,17 +239,52 @@ export default function ClientPage({
         },
       };
     }
+    // 예약 시작일 또는 종료일인 경우 노란색으로 표시 (먼저 검사)
+    if (
+      events.some((event) => moment(event.start).isSame(moment(date), "day"))
+    ) {
+      return {
+        style: {
+          //
+          backgroundColor: "Pink",
+        },
+      };
+    }
+    if (events.some((event) => moment(event.end).isSame(moment(date), "day"))) {
+      return {
+        style: {
+          //
+          backgroundColor: "Pink",
+        },
+      };
+    }
     if (events.some((event) => isDateInEventRange(date, event))) {
       return {
         style: {
-          backgroundColor: "lightgreen",
-          pointerEvents: "none", // 선택 불가능하게 설정
+          backgroundColor: "Lightcoral",
+          pointerEvents: "none",
+        },
+      };
+    }
+    if (
+      reservedDates.some((reservedDate) =>
+        moment(reservedDate).isSame(date, "day")
+      ) &&
+      !events.some(
+        (event) =>
+          moment(event.start).isSame(date, "day") ||
+          moment(event.end).isSame(date, "day")
+      )
+    ) {
+      return {
+        style: {
+          backgroundColor: "Lightcoral",
+          pointerEvents: "none",
         },
       };
     }
     return {};
   };
-
   // 시간 변경 핸들러
   const handleStartTimeChange = (time: string) => {
     setStartTime(time);
