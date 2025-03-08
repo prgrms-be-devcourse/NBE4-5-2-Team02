@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -180,13 +181,13 @@ public class ReservationService {
 		List<Reservation> postReservations = reservationRepository.findByPostId(postId);
 
 		// 요청, 거절, 완료, 실패 상태의 경우 필터링
-		List<ReservationStatus> excludedStatuses = List.of(
+		List<ReservationStatus> includedStatuses = List.of(
 			ReservationStatus.APPROVED,
 			ReservationStatus.IN_PROGRESS
 		);
 
 		List<Reservation> filteredPostReservations = postReservations.stream()
-			.filter(reservation -> excludedStatuses.contains(reservation.getStatus()))
+			.filter(reservation -> includedStatuses.contains(reservation.getStatus()))
 			.toList();
 
 		return filteredPostReservations.stream()
@@ -204,6 +205,32 @@ public class ReservationService {
 			currentDate = currentDate.plusDays(1);
 		}
 		return dates;
+	}
+
+	@Transactional(readOnly = true)
+	public List<ReservationResponse> getReservationsByPostId(Long postId) {
+		List<Reservation> reservations = reservationRepository.findByPostId(postId);
+		List<ReservationResponse> responses = new ArrayList<>();
+		List<ReservationStatus> includedStatuses = List.of(
+			ReservationStatus.APPROVED,
+			ReservationStatus.IN_PROGRESS
+		);
+		reservations.stream()
+			.filter(reservation -> includedStatuses.contains(reservation.getStatus()))
+			.forEach(reservation -> {
+			responses.add(new ReservationResponse(
+				reservation.getId(),
+				reservation.getStatus().name(),
+				reservation.getPost().getId(),
+				reservation.getStartTime(),
+				reservation.getEndTime(),
+				reservation.getAmount(),
+				reservation.getRejectionReason(),
+				reservation.getOwner().getId(),
+				reservation.getRenter().getId()
+			));
+		});
+		return responses;
 	}
 
     // 렌탈 예약 정보 DB에서 조회

@@ -1,6 +1,7 @@
 package com.snackoverflow.toolgether.domain.reservation.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.snackoverflow.toolgether.domain.reservation.dto.ReservationRequest;
 import com.snackoverflow.toolgether.domain.reservation.dto.ReservationResponse;
 import com.snackoverflow.toolgether.domain.reservation.entity.FailDue;
+import com.snackoverflow.toolgether.domain.reservation.entity.Reservation;
 import com.snackoverflow.toolgether.domain.reservation.service.ReservationService;
 import com.snackoverflow.toolgether.global.dto.RsData;
 
@@ -85,12 +87,12 @@ public class ReservationController {
 	}
 
 	@GetMapping("/reservatedDates/{id}")
-	public RsData<Set<LocalDate>> getReservedDates(@PathVariable Long id) {
-		Set<LocalDate> reservationDates = reservationService.getDateListByPostId(id);
+	public RsData<List<ReservationResponse>> getReservedDates(@PathVariable Long id) {
+		List<ReservationResponse> reservations = reservationService.getReservationsByPostId(id);
 		return new RsData<>(
 			"200-1",
 			"%d번 게시글의 예약 일정 조회 성공".formatted(id),
-			reservationDates
+			reservations
 		);
 	}
 }
