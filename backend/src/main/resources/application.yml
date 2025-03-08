@@ -7,13 +7,23 @@ jwt:
   secret: [change]
   expiration: 86400000 # 24시간(초 단위)
 
+kakao:
+  rest:
+    api:
+      key: [change]
+
+spring:
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: [change]
-            client-secret: [change]
+            client-id: [ change ]
+            client-secret: [ change ]
             redirect-uri: http://localhost:3000/redirect
             scope:
               - openid
@@ -23,11 +33,6 @@ jwt:
         provider:
           google:
             issuer-uri: https://accounts.google.com
-
-spring:
-  jackson:
-    serialization:
-      fail-on-empty-beans: false
 
   output:
     ansi:
@@ -71,6 +76,3 @@ logging:
     org.hibernate.orm.jdbc.bind: TRACE
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
-
-
-
