@@ -18,13 +18,3 @@
 .rbc-day-bg * {
   border: none !important;
 }
-
-/* CustomCalendar.css 또는 글로벌 CSS 파일에 추가 */
-
-.time-block-button {
-  width: 40px; /* 원하는 너비 설정 */
-  height: 25px; /* 원하는 높이 설정 */
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-}

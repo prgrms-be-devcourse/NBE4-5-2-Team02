@@ -181,6 +181,10 @@ export default function ClientPage({
           .add(moment(endTime, "HH:mm").minutes(), "minutes");
         const diff = moment.duration(endDateTime.diff(startDateTime));
         const hours = Math.ceil(diff.asHours());
+        if (hours < 0) {
+          alert("0시간 이상 선택해주세요.");
+          return;
+        }
         setUsageDuration(`${hours}시간 이용`);
         setTotalPrice(price * hours);
       } else if (priceType === "DAY") {

@@ -21,10 +21,9 @@ const DateBox: React.FC<DateBoxProps> = ({
     );
   }
 
-  const timeBlocks = Array.from({ length: 48 }, (_, i) => {
-    const hour = Math.floor(i / 2);
-    const minute = i % 2 === 0 ? "00" : "30";
-    return `${hour.toString().padStart(2, "0")}:${minute}`;
+  const timeBlocks = Array.from({ length: 24 }, (_, i) => {
+    // 24개 블록으로 변경
+    return `${i.toString().padStart(2, "0")}:00`;
   });
 
   const isTimeReserved = (timeBlock: string) => {
@@ -78,30 +77,32 @@ const DateBox: React.FC<DateBoxProps> = ({
       <div className="mt-2">{time}</div>
       <div className="flex flex-col mt-2">
         <div className="flex">
-          {timeBlocks.slice(0, 24).map((timeBlock) => (
+          {timeBlocks.slice(0, 12).map((timeBlock) => (
             <button
               key={timeBlock}
-              className={`p-1 border rounded-sm text-xs whitespace-nowrap ${
+              className={`w-10 h-6 m-0.5 border rounded-sm text-xs whitespace-nowrap flex items-center justify-center ${
                 isTimeReserved(timeBlock)
-                  ? "bg-gray-200 text-gray-500"
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                   : "hover:bg-gray-100"
               }`}
               onClick={() => handleTimeBlockClick(timeBlock)}
+              disabled={isTimeReserved(timeBlock)} // 예약된 시간은 클릭 비활성화
             >
               {timeBlock}
             </button>
           ))}
         </div>
         <div className="flex">
-          {timeBlocks.slice(24).map((timeBlock) => (
+          {timeBlocks.slice(12).map((timeBlock) => (
             <button
               key={timeBlock}
-              className={`p-1 border rounded-sm text-xs whitespace-nowrap ${
+              className={`w-10 h-6 m-0.5 border rounded-sm text-xs whitespace-nowrap flex items-center justify-center ${
                 isTimeReserved(timeBlock)
-                  ? "bg-gray-200 text-gray-500"
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                   : "hover:bg-gray-100"
               }`}
               onClick={() => handleTimeBlockClick(timeBlock)}
+              disabled={isTimeReserved(timeBlock)} // 예약된 시간은 클릭 비활성화
             >
               {timeBlock}
             </button>
