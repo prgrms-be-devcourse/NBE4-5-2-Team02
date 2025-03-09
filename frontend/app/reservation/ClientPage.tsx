@@ -70,6 +70,7 @@ export default function ClientPage({
     const loadReservedEvents = async () => {
       const events = await fetchReservedEvents(post.id);
       setEvents(events);
+      console.log("Reserved events:", events);
       processReservedEvents(events);
     };
     loadReservedEvents();
@@ -245,7 +246,6 @@ export default function ClientPage({
     ) {
       return {
         style: {
-          //
           backgroundColor: "Pink",
         },
       };
@@ -253,7 +253,6 @@ export default function ClientPage({
     if (events.some((event) => moment(event.end).isSame(moment(date), "day"))) {
       return {
         style: {
-          //
           backgroundColor: "Pink",
         },
       };
@@ -371,19 +370,25 @@ export default function ClientPage({
           events={events} // 이벤트 데이터 전달
         />
       </div>
-      <div className="flex mt-10 space-x-4 justify-center">
+      <div className="flex flex-col mt-10 space-x-4 justify-center">
         {" "}
         {/* 시작일, 종료일 데이터 박스 */}
-        <DateBox
-          date={selectedDates[0]}
-          onTimeChange={handleStartTimeChange}
-          time={startTime}
-        />
-        <DateBox
-          date={selectedDates[1]}
-          onTimeChange={handleEndTimeChange}
-          time={endTime}
-        />
+        <div className="w-full mb-6">
+          <DateBox
+            date={selectedDates[0]}
+            onTimeChange={handleStartTimeChange}
+            time={startTime}
+            events={events}
+          />
+        </div>
+        <div className="w-full">
+          <DateBox
+            date={selectedDates[1]}
+            onTimeChange={handleEndTimeChange}
+            time={endTime}
+            events={events}
+          />
+        </div>
       </div>
       <div className="flex flex-col justify-center items-center mt-10 w-[50%] text-xl">
         <div className="flex flex-col mt-4 w-full">
