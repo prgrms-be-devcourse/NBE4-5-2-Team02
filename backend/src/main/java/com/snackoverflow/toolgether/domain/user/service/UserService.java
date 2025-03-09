@@ -1,5 +1,7 @@
 package com.snackoverflow.toolgether.domain.user.service;
 
+import com.snackoverflow.toolgether.domain.postimage.entity.PostImage;
+import com.snackoverflow.toolgether.domain.user.dto.request.PatchMyInfoRequest;
 import org.springframework.transaction.annotation.Transactional;
 import com.snackoverflow.toolgether.domain.user.dto.MeInfoResponse;
 import com.snackoverflow.toolgether.domain.user.entity.User;
@@ -10,7 +12,6 @@ import com.snackoverflow.toolgether.global.exception.custom.mail.VerificationExc
 import com.snackoverflow.toolgether.global.exception.ServiceException;
 import com.snackoverflow.toolgether.global.exception.custom.user.UserNotFoundException;
 import com.snackoverflow.toolgether.global.util.JwtUtil;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,6 +43,18 @@ public class UserService {
         }
     }
 
+    public void checkMyInfoDuplicates(PatchMyInfoRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new DuplicateFieldException("사용자 EMAIL 중복 오류 발생");
+        }
+        if (userRepository.existsByNickname(request.getNickname())) {
+            throw new DuplicateFieldException("사용자 닉네임 중복 오류 발생");
+        }
+        if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+            throw new DuplicateFieldException("사용자 전화번호 중복 오류 발생");
+        }
+    }
+
     // 회원 가입
     @Transactional
     public void registerVerifiedUser(SignupRequest request) {
@@ -64,11 +77,11 @@ public class UserService {
                 .latitude(request.getLatitude())
                 .phoneNumber(request.getPhoneNumber())
                 .profileImage(null)
+                .additionalInfoRequired(false)
                 .build();
 
         userRepository.save(user);
     }
-
 
     // 기본 사용자 로그인
     public LoginResult loginUser(String username, String password) {
@@ -88,8 +101,6 @@ public class UserService {
     }
 
     public record LoginResult(String userName, String token) {}
-
-    // 소셜 로그인
 
     // username 으로 사용자 찾기
     public User getUserForUsername(String username) {
@@ -122,5 +133,35 @@ public class UserService {
         return userRepository.findByUsername(username).orElseThrow(
                 () -> new ServiceException("404-1", "해당 유저를 찾을 수 없습니다")
         );
+    }
+
+    @Transactional
+    public void postProfileImage(User user, String uuid) {
+        user.updateProfileImage(uuid);
+        userRepository.save(user);
+
+    }
+
+    @Transactional
+    public void deleteProfileImage(User user) {
+        user.deleteProfileImage();
+        userRepository.save(user);
+
+    }
+
+    @Transactional
+    public void updateMyInfo(User user, PatchMyInfoRequest request) {
+        user.updateEmail(request.getEmail());
+        user.updatePhoneNumber(request.getPhoneNumber());
+        user.updateNickname(request.getNickname());
+        user.updateAddress(request.getAddress().getMainAddress(), request.getAddress().getDetailAddress(), request.getAddress().getZipcode());
+        user.updateLocation(request.getLatitude(), request.getLongitude());
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(User user) {
+        user.delete();
+        userRepository.save(user);
     }
 }
