@@ -175,38 +175,6 @@ public class ReservationService {
 				.build()));
 	}
 
-	// 해당 포스트의 예약 날짜 조회
-	@Transactional(readOnly = true)
-	public Set<LocalDate> getDateListByPostId(Long postId) {
-		List<Reservation> postReservations = reservationRepository.findByPostId(postId);
-
-		// 요청, 거절, 완료, 실패 상태의 경우 필터링
-		List<ReservationStatus> includedStatuses = List.of(
-			ReservationStatus.APPROVED,
-			ReservationStatus.IN_PROGRESS
-		);
-
-		List<Reservation> filteredPostReservations = postReservations.stream()
-			.filter(reservation -> includedStatuses.contains(reservation.getStatus()))
-			.toList();
-
-		return filteredPostReservations.stream()
-			.flatMap(reservation -> getDatesBetween(reservation.getStartTime().toLocalDate(), reservation.getEndTime().toLocalDate()).stream())
-			.collect(Collectors.toCollection(HashSet::new));
-	}
-
-	// 사이 날짜 계산 함수
-	public Set<LocalDate> getDatesBetween(LocalDate startDate, LocalDate endDate) {
-		Set<LocalDate> dates = new HashSet<>();
-		LocalDate currentDate = startDate;
-
-		while (!currentDate.isAfter(endDate)) {
-			dates.add(currentDate);
-			currentDate = currentDate.plusDays(1);
-		}
-		return dates;
-	}
-
 	@Transactional(readOnly = true)
 	public List<ReservationResponse> getReservationsByPostId(Long postId) {
 		List<Reservation> reservations = reservationRepository.findByPostId(postId);
