@@ -172,14 +172,12 @@ public class PostServiceImpl implements PostService {
         postAvailabilityRepository.saveAll(postAvailabilities);
     }
 
-
     @Transactional
     @Override
     public Page<PostResponse> searchPosts(PostSearchRequest request, Pageable pageable) {
         Page<Post> posts = postQueryRepository.searchPosts(request, pageable);
         return posts.map(PostResponse::new);
     }
-
 
     // 예약에 필요한 메서드
     @Transactional(readOnly = true)
