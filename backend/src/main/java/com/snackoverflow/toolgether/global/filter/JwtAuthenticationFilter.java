@@ -1,6 +1,5 @@
 package com.snackoverflow.toolgether.global.filter;
 
-import com.snackoverflow.toolgether.global.exception.custom.mail.CustomAuthException;
 import com.snackoverflow.toolgether.global.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -10,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,8 +18,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;
-
-import static com.snackoverflow.toolgether.global.exception.custom.mail.CustomAuthException.AuthErrorType.MALFORMED_TOKEN;
 
 @Slf4j
 @Component
@@ -45,17 +41,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Claims claims = jwtUtil.getPayload(token.get());
                 log.info("JWT claims={}", claims);
 
-                // claims 안에 username이 있는지 확인
-                if (!claims.containsKey("username")) {
-                    throw new CustomAuthException(MALFORMED_TOKEN, "유효하지 않은 토큰입니다.");
-                }
-
                 // 사용자 정보 추출
                 String username = (String) claims.get("username"); // 사용자의 아이디
+                String email = (String) claims.get("email");
                 log.info("token -> username: {}", username);
+                log.info("token -> email: {}", email);
 
                 // 인증 객체 생성 및 저장
-                CustomUserDetails customUserDetails = new CustomUserDetails(username);
+                CustomUserDetails customUserDetails = new CustomUserDetails(username, email);
                 Authentication authentication = new UsernamePasswordAuthenticationToken(customUserDetails,
                         null, Collections.emptyList());
                 log.info("authentication={}", authentication);
@@ -67,5 +60,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 토큰이 없어도 게시물은 조회할 수 있도록
             filterChain.doFilter(request, response);
         }
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String requestURI = request.getRequestURI();
+        return requestURI.startsWith("/h2-console") || requestURI.matches(".*\\.(css|js|gif|png|jpg|ico)$");
     }
 }
