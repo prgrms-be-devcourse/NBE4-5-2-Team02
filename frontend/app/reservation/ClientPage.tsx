@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar, momentLocalizer } from "react-big-calendar";
-import moment from "moment";
+import moment, { duration } from "moment";
 import "moment/locale/ko";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./CustomCalendar.css";
@@ -181,10 +181,7 @@ export default function ClientPage({
           .add(moment(endTime, "HH:mm").minutes(), "minutes");
         const diff = moment.duration(endDateTime.diff(startDateTime));
         const hours = Math.ceil(diff.asHours());
-        if (hours < 0) {
-          alert("0시간 이상 선택해주세요.");
-          return;
-        }
+
         setUsageDuration(`${hours}시간 이용`);
         setTotalPrice(price * hours);
       } else if (priceType === "DAY") {
@@ -302,6 +299,10 @@ export default function ClientPage({
 
   const handleReservation = async () => {
     try {
+      if (usageDuration.startsWith("-")) {
+        alert("시간 선택이 잘못되었습니다.");
+        return;
+      }
       if (selectedDates.length === 2) {
         const startDate = moment(selectedDates[0])
           .format("YYYY-MM-DD")
