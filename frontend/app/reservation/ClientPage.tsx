@@ -241,27 +241,9 @@ export default function ClientPage({
         },
       };
     }
-    // 예약 시작일 또는 종료일인 경우 노란색으로 표시 (먼저 검사)
-    if (
-      events.some((event) => moment(event.start).isSame(moment(date), "day"))
-    ) {
-      return {
-        style: {
-          backgroundColor: "Pink",
-        },
-      };
-    }
-    if (events.some((event) => moment(event.end).isSame(moment(date), "day"))) {
-      return {
-        style: {
-          backgroundColor: "Pink",
-        },
-      };
-    }
     if (events.some((event) => isDateInEventRange(date, event))) {
       return {
         style: {
-          backgroundColor: "Lightcoral",
           pointerEvents: "none",
         },
       };
@@ -278,7 +260,6 @@ export default function ClientPage({
     ) {
       return {
         style: {
-          backgroundColor: "Lightcoral",
           pointerEvents: "none",
         },
       };

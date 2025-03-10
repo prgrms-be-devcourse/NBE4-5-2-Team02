@@ -1,4 +1,6 @@
+"use client";
 import moment from "moment";
+import { useState } from "react";
 
 interface DateBoxProps {
   date: Date | null;
@@ -82,7 +84,9 @@ const DateBox: React.FC<DateBoxProps> = ({
               key={timeBlock}
               className={`w-10 h-6 m-0.5 border rounded-sm text-xs whitespace-nowrap flex items-center justify-center ${
                 isTimeReserved(timeBlock)
-                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  ? "bg-red-200 text-gray-500 cursor-not-allowed"
+                  : time === timeBlock
+                  ? "bg-green-200"
                   : "hover:bg-gray-100"
               }`}
               onClick={() => handleTimeBlockClick(timeBlock)}
@@ -98,7 +102,9 @@ const DateBox: React.FC<DateBoxProps> = ({
               key={timeBlock}
               className={`w-10 h-6 m-0.5 border rounded-sm text-xs whitespace-nowrap flex items-center justify-center ${
                 isTimeReserved(timeBlock)
-                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  ? "bg-red-200 text-gray-500 cursor-not-allowed"
+                  : time === timeBlock
+                  ? "bg-green-200"
                   : "hover:bg-gray-100"
               }`}
               onClick={() => handleTimeBlockClick(timeBlock)}
