@@ -63,8 +63,8 @@ spring:
     open-in-view: false
 
   mail:
-    username: [change]
-    password: [change]
+    username: writeyourmail0123@gmail.com
+    password: writeAppPassword
     host: smtp.gmail.com
     port: 587
     properties:
@@ -77,3 +77,6 @@ logging:
     org.hibernate.orm.jdbc.bind: TRACE
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
+
+
+
