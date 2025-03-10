@@ -297,19 +297,50 @@ export default function ClientPage({
   // 보증금
   const deposit = 10000;
 
+  const isOverlapping = (
+    newStartTime: moment.Moment,
+    newEndTime: moment.Moment,
+    events: any[]
+  ) => {
+    for (const event of events) {
+      const existingStartTime = moment(event.start);
+      const existingEndTime = moment(event.end);
+
+      // 겹침 조건 확인 (여러 가지 방법 중 하나)
+      if (
+        newStartTime.isBefore(existingEndTime) &&
+        newEndTime.isAfter(existingStartTime)
+      ) {
+        return true; // 겹침 발견
+      }
+    }
+    return false; // 겹치는 예약 없음
+  };
+
   const handleReservation = async () => {
     try {
       if (usageDuration.startsWith("-")) {
         alert("시간 선택이 잘못되었습니다.");
         return;
       }
-      if (selectedDates.length === 2) {
+      if (selectedDates.length === 2 && selectedDates[0] && selectedDates[1]) {
+        //selectedDates가 null이 아닐경우
         const startDate = moment(selectedDates[0])
           .format("YYYY-MM-DD")
           .concat(`T${startTime}:00`);
         const endDate = moment(selectedDates[1])
           .format("YYYY-MM-DD")
           .concat(`T${endTime}:00`);
+
+        // Moment 객체로 변환
+        const newStartTime = moment(startDate);
+        const newEndTime = moment(endDate);
+
+        // 겹침 확인
+        if (isOverlapping(newStartTime, newEndTime, events)) {
+          alert("선택하신 시간에 이미 예약이 있습니다.");
+          return; // 예약 처리 중단
+        }
 
         const reservationData = {
           postId: post.id,
