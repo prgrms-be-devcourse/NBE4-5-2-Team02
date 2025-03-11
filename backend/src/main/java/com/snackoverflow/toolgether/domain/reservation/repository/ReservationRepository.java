@@ -16,6 +16,4 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByOwnerId(Long ownerId);
 
     List<Reservation> findByPostId(Long postId);
-
-    List<Reservation> findByStatusAndStartTimeBefore(String status, LocalDateTime startTime);
 }

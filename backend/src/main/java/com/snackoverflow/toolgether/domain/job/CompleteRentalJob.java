@@ -20,7 +20,7 @@ public class CompleteRentalJob implements Job{
 	private ReservationService reservationService;
 
 	@Override
-	public void execute(JobExecutionContext context) throws JobExecutionException {
+	public void execute(JobExecutionContext context) {
 		JobDataMap jobDataMap = context.getMergedJobDataMap();
 		Object reservationIdObj = jobDataMap.get("reservationId");
 		Long reservationId = null;
