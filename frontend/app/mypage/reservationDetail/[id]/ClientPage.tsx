@@ -69,9 +69,9 @@ function RequestedStatus({
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false); // 추가: 승인/거절 확인 모달
   const [modalMessage, setModalMessage] = useState(""); // 추가: 모달 메시지
-  const [actionType, setActionType] = useState<"approve" | "reject" | null>(
-    null
-  );
+  const [actionType, setActionType] = useState<
+    "approve" | "reject" | "cancel" | null
+  >(null);
   const [rejectionReason, setRejectionReason] = useState("");
 
   const openModal = () => setShowModal(true);
@@ -90,8 +90,10 @@ function RequestedStatus({
   };
 
   const handleCancel = () => {
-    // 예약 취소 로직
-    console.log("예약 취소");
+    //여기도 수정
+    setActionType("cancel");
+    setModalMessage("정말 취소하시겠습니까?");
+    setShowConfirmModal(true);
   };
 
   // 승인 or 거절 API
@@ -140,6 +142,25 @@ function RequestedStatus({
         }
       } catch (error) {
         alert("거절 처리 중 오류 발생");
+        console.error(error);
+      }
+    } else if (actionType === "cancel") {
+      // 취소 로직
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/v1/reservations/${reservation.id}/cancel`,
+          {
+            method: "PATCH",
+          }
+        );
+        if (response.ok) {
+          window.location.reload(); // 성공 시 새로고침
+        } else {
+          const errorData = await response.json();
+          alert(`취소 실패: ${errorData.message || "서버 오류"}`);
+        }
+      } catch (error) {
+        alert("취소 처리 중 오류 발생");
         console.error(error);
       }
     }
@@ -608,6 +629,18 @@ function DoneStatus({
   );
 }
 
+function CancelledStatus({ reservation }: { reservation: Reservation }) {
+  return (
+    <div className="flex flex-col items-center justify-center w-[70%] h-150 border rounded-lg shadow-md p-6 bg-gray-200">
+      <p className="text-5xl font-bold text-gray-600 mb-4">❌</p>
+      <p className="text-4xl font-bold text-gray-600 mb-4">
+        이미 취소된 예약입니다
+      </p>
+      <p className="text-lg mb-2">예약 ID: {reservation.id}</p>
+    </div>
+  );
+}
+
 export default function ClientPage({
   reservation,
   deposit,
@@ -717,6 +750,9 @@ export default function ClientPage({
           owner={owner}
           reason="RENTER_ISSUE"
         />
+      )}
+      {reservation.status === "CANCELED" && (
+        <CancelledStatus reservation={reservation} />
       )}
       <button
         className="mt-4 bg-green-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
