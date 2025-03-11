@@ -610,6 +610,12 @@ function DoneStatus({
   reservation: Reservation;
   deposit: Deposit;
 }) {
+  const router = useRouter(); // useRouter 훅 사용
+
+  const goToReviewPage = () => {
+    // 임시 URL.  나중에 실제 리뷰 페이지 URL로 변경해야 함.
+    router.push(`/review/${reservation.id}`);
+  };
   return (
     <div className="flex flex-col items-center justify-center w-[70%] h-150 border rounded-lg shadow-md p-6 bg-gray-200">
       <p className="text-5xl font-bold text-gray-600 mb-4">🏁</p>
@@ -625,6 +631,12 @@ function DoneStatus({
         대여료 {reservation.amount - deposit.amount}₩ + 보증금 {deposit.amount}₩
       </p>
       <p className="text-lg mb-2 font-bold">합계 {reservation.amount}₩</p>
+      <button
+        className="mt-4 bg-green-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded"
+        onClick={goToReviewPage}
+      >
+        유저 리뷰하기
+      </button>
     </div>
   );
 }
