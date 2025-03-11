@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -122,6 +123,20 @@ public class ReservationService {
 		// 보증금 상태 변경 및 반환 사유 업데이트
 		DepositHistory depositHistory = depositHistoryService.findDepositHistoryByReservationId(reservationId);
 		depositHistoryService.updateDepositHistory(depositHistory.getId(), DepositStatus.RETURNED, ReturnReason.NORMAL_COMPLETION);
+
+		// 대여자 크레딧 업데이트
+		userService.updateUserCredit(reservation.getRenter().getId(), depositHistory.getAmount());
+	}
+
+	// 대여자 예약 취소
+	@Transactional
+	public void cancelReservation(Long reservationId) {
+		Reservation reservation = findReservationByIdOrThrow(reservationId);
+		reservation.canceled();
+
+		// 보증금 상태 변경 및 반환 사유 업데이트
+		DepositHistory depositHistory = depositHistoryService.findDepositHistoryByReservationId(reservationId);
+		depositHistoryService.updateDepositHistory(depositHistory.getId(), DepositStatus.RETURNED, ReturnReason.REJECTED);
 
 		// 대여자 크레딧 업데이트
 		userService.updateUserCredit(reservation.getRenter().getId(), depositHistory.getAmount());

@@ -49,6 +49,13 @@ public class ReservationController {
 			"%d번 예약 거절 성공".formatted(id));
 	}
 
+	@PatchMapping("/{id}/cancel")
+	public RsData<Void> cancelReservation(@PathVariable Long id) {
+		reservationService.cancelReservation(id);
+		return new RsData<>("200-1",
+			"%d번 예약 취소 성공".formatted(id));
+	}
+
 	@PatchMapping("/{id}/start")
 	public RsData<Void> startRental(@PathVariable Long id) {
 		reservationService.startRental(id);
