@@ -25,6 +25,8 @@ export default function ClientPage() {
     longitude?: string;
   }>({});
   const [, setGeoError] = useState("");
+  
+  const BASE_URL = 'http://localhost:8080';
 
   const router = useRouter();
 
@@ -77,7 +79,7 @@ export default function ClientPage() {
 
   //유저정보 조회
   const getData = async () => {
-    const getMyInfo = await fetch("http://localhost:8080/api/v1/mypage/me", {
+    const getMyInfo = await fetch(`${BASE_URL}/api/v1/mypage/me`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -249,7 +251,7 @@ export default function ClientPage() {
       longitude,
     });
     try {
-      const response = await fetch("http://localhost:8080/api/v1/mypage/me", {
+      const response = await fetch(`${BASE_URL}/api/v1/mypage/me`, {
         method: "PATCH",
         credentials: "include",
         headers: {

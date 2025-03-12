@@ -110,6 +110,8 @@ export default function ClientPage() {
   );
   const [isCancelButton, setIsCancelButton] = useState(true);
 
+  const BASE_URL = 'http://localhost:8080';
+
   const localizer = momentLocalizer(moment);
 
   useEffect(() => {
@@ -229,7 +231,7 @@ export default function ClientPage() {
 
   //유저정보 조회
   const getMe = async () => {
-    const getMyInfo = await fetch("http://localhost:8080/api/v1/mypage/me", {
+    const getMyInfo = await fetch(`${BASE_URL}/api/v1/mypage/me`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -251,7 +253,7 @@ export default function ClientPage() {
   //예약정보 조회
   const getReservations = async () => {
     const getMyReservations = await fetch(
-      "http://localhost:8080/api/v1/mypage/reservations",
+      `${BASE_URL}/api/v1/mypage/reservations`,
       {
         method: "GET",
         credentials: "include",
@@ -288,7 +290,7 @@ export default function ClientPage() {
 
     try {
       const uploadProfile = await fetch(
-        "http://localhost:8080/api/v1/mypage/profile",
+        `${BASE_URL}/api/v1/mypage/profile`,
         {
           method: "POST",
           credentials: "include",
@@ -333,7 +335,7 @@ export default function ClientPage() {
   const handleDeleteProfile = async () => {
     try {
       const deleteProfile = await fetch(
-        "http://localhost:8080/api/v1/mypage/profile",
+        `${BASE_URL}/api/v1/mypage/profile`,
         {
           method: "DELETE",
           credentials: "include",
@@ -380,7 +382,7 @@ export default function ClientPage() {
   const handleWithdrawMembership = async () => {
     try {
       const withdrawMembership = await fetch(
-        "http://localhost:8080/api/v1/mypage/me",
+        `${BASE_URL}/api/v1/mypage/me`,
         {
           method: "DELETE",
           credentials: "include",

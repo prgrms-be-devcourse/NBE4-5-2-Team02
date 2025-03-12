@@ -345,6 +345,7 @@ public class ReservationService {
         return reservationRepository.findByRenterId(userId);
     }
 
+	@Transactional(readOnly = true)
 	public Optional<Reservation> getReservationByIdForReview(Long reservationId) {
 		return reservationRepository.findById(reservationId);
 	}
