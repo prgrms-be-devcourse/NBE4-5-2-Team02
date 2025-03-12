@@ -187,14 +187,14 @@ public class BaseInitData {
         reviewRepository.saveAndFlush(review1);
 
         // Review 데이터 생성 (reservation2에 대한 리뷰)
-        Review review2 = Review.builder()
-                .reviewer(user1) // user1이 작성
-                .reviewee(user2) // user2에게 리뷰
-                .reservation(reservation2)
-                .productScore(4)
-                .timeScore(4)
-                .kindnessScore(4)
-                .build();
-        reviewRepository.saveAndFlush(review2);
+//        Review review2 = Review.builder()
+//                .reviewer(user1) // user1이 작성
+//                .reviewee(user2) // user2에게 리뷰
+//                .reservation(reservation2)
+//                .productScore(4)
+//                .timeScore(4)
+//                .kindnessScore(4)
+//                .build();
+//        reviewRepository.saveAndFlush(review2);
 	}
 }
