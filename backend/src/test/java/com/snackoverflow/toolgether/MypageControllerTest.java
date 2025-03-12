@@ -106,7 +106,7 @@ public class MypageControllerTest {
 
 		MeInfoResponse meInfoResponse = MeInfoResponse.from(user);
 
-		CustomUserDetails mockUserDetails = new CustomUserDetails("human123", "test1@gmail.com"); // ✅ username을 "human123"으로 설정
+		CustomUserDetails mockUserDetails = new CustomUserDetails("human123", "test1@gmail.com", 1L); // ✅ username을 "human123"으로 설정
 
 		when(loginUserArgumentResolver.supportsParameter(any())).thenReturn(true);
 		when(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(mockUserDetails);
@@ -188,7 +188,7 @@ public class MypageControllerTest {
 		List<Reservation> rentals = new ArrayList<>();
 		rentals.add(reservation);
 
-		CustomUserDetails mockUserDetails = new CustomUserDetails("human123", "test1@gmail.com");
+		CustomUserDetails mockUserDetails = new CustomUserDetails("human123", "test1@gmail.com", 1L);
 
 		when(loginUserArgumentResolver.supportsParameter(any())).thenReturn(true);
 		when(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(mockUserDetails);
@@ -272,7 +272,7 @@ public class MypageControllerTest {
 				latitude
 		).stripIndent();
 
-		CustomUserDetails mockUserDetails = new CustomUserDetails("human123", "test1@gmail.com");
+		CustomUserDetails mockUserDetails = new CustomUserDetails("human123", "test1@gmail.com", 1L);
 
 		when(loginUserArgumentResolver.supportsParameter(any())).thenReturn(true);
 		when(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(mockUserDetails);
@@ -310,7 +310,7 @@ public class MypageControllerTest {
 				.email("test1@gmail.com")
 				.build();
 
-		CustomUserDetails mockUserDetails = new CustomUserDetails("human123", "test1@gmail.com");
+		CustomUserDetails mockUserDetails = new CustomUserDetails("human123", "test1@gmail.com", 1L);
 
 		when(loginUserArgumentResolver.supportsParameter(any())).thenReturn(true);
 		when(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(mockUserDetails);
@@ -341,7 +341,7 @@ public class MypageControllerTest {
 				.email("test1@gmail.com")
 				.build();
 
-		CustomUserDetails mockUserDetails = new CustomUserDetails("human123", "test1@gmail.com");
+		CustomUserDetails mockUserDetails = new CustomUserDetails("human123", "test1@gmail.com", 1L);
 
 		when(loginUserArgumentResolver.supportsParameter(any())).thenReturn(true);
 		when(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(mockUserDetails);
@@ -379,7 +379,7 @@ public class MypageControllerTest {
 				.email("test1@gmail.com")
 				.build();
 
-		CustomUserDetails mockUserDetails = new CustomUserDetails("human123", "test1@gmail.com");
+		CustomUserDetails mockUserDetails = new CustomUserDetails("human123", "test1@gmail.com", 1L);
 
 		when(loginUserArgumentResolver.supportsParameter(any())).thenReturn(true);
 		when(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(mockUserDetails);

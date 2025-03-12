@@ -124,7 +124,7 @@ public class ReviewControllerTest {
         String reviewRequestJson = objectMapper.writeValueAsString(reviewRequest);
 
         // 로그인을 위해 추가
-        CustomUserDetails mockUserDetails = new CustomUserDetails("human123", "test1@gmail.com");
+        CustomUserDetails mockUserDetails = new CustomUserDetails("human123", "test1@gmail.com", 1L);
         when(loginUserArgumentResolver.supportsParameter(any())).thenReturn(true);
         when(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(mockUserDetails);
 
