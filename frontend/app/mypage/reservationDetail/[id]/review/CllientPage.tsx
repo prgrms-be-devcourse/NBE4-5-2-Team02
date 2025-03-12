@@ -4,6 +4,7 @@ import React, { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ReviewScoreIcon } from "@/components/ReviewScoreIcon";
+import { fetchWithAuth } from "@/app/lib/util/fetchWithAuth";
 
 interface ReviewData {
   productScore: number | null;
@@ -65,7 +66,7 @@ const ReviewPage: React.FC<{
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/api/v1/review/create`, {
+      const response = await fetchWithAuth(`${BASE_URL}/api/v1/review/create`, {
         method: "POST",
         credentials: "include",
         headers: {

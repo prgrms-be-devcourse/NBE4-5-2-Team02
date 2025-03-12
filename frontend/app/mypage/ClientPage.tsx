@@ -8,6 +8,7 @@ import { useMemo, useState, useEffect } from "react";
 import ScoreIcon from "../lib/util/scoreIcon";
 import Link from "next/link";
 import Image from "next/image";
+import { fetchWithAuth } from "../lib/util/fetchWithAuth";
 
 interface Me {
   id: number;
@@ -231,7 +232,7 @@ export default function ClientPage() {
 
   //유저정보 조회
   const getMe = async () => {
-    const getMyInfo = await fetch(`${BASE_URL}/api/v1/mypage/me`, {
+    const getMyInfo = await fetchWithAuth(`${BASE_URL}/api/v1/mypage/me`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -252,7 +253,7 @@ export default function ClientPage() {
 
   //예약정보 조회
   const getReservations = async () => {
-    const getMyReservations = await fetch(
+    const getMyReservations = await fetchWithAuth(
       `${BASE_URL}/api/v1/mypage/reservations`,
       {
         method: "GET",
@@ -289,7 +290,7 @@ export default function ClientPage() {
     formData.append("profileImage", file);
 
     try {
-      const uploadProfile = await fetch(
+      const uploadProfile = await fetchWithAuth(
         `${BASE_URL}/api/v1/mypage/profile`,
         {
           method: "POST",
@@ -334,7 +335,7 @@ export default function ClientPage() {
 
   const handleDeleteProfile = async () => {
     try {
-      const deleteProfile = await fetch(
+      const deleteProfile = await fetchWithAuth(
         `${BASE_URL}/api/v1/mypage/profile`,
         {
           method: "DELETE",
@@ -381,7 +382,7 @@ export default function ClientPage() {
 
   const handleWithdrawMembership = async () => {
     try {
-      const withdrawMembership = await fetch(
+      const withdrawMembership = await fetchWithAuth(
         `${BASE_URL}/api/v1/mypage/me`,
         {
           method: "DELETE",
@@ -437,7 +438,7 @@ export default function ClientPage() {
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">마이페이지</h1>
           <Link href="/mypage/edit">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
               마이페이지 수정
             </button>
           </Link>
