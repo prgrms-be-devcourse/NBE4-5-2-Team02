@@ -299,7 +299,6 @@ public class ReservationService {
 				.title("예약 조회 실패")
 				.status(404)
 				.detail("해당 ID의 예약을 찾을 수 없습니다.")
-				.instance(URI.create(ServletUriComponentsBuilder.fromCurrentRequestUri().toUriString()))
 				.build()));
 	}
 
