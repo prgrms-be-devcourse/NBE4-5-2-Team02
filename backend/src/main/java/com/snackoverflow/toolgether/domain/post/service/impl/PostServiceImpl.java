@@ -65,7 +65,7 @@ public class PostServiceImpl implements PostService {
         List<PostImage> images = request.getImages().stream()
                 .map(image -> PostImage.builder()
                         .post(post)
-                        .postImage(image)
+                        .imageUrl(image)
                         .build())
                 .toList();
 
@@ -80,19 +80,20 @@ public class PostServiceImpl implements PostService {
     @Transactional
     @Override
     public PostResponse getPostById(Long postId) {
-        Post post = postRepository.findById(postId)
+        /*Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("404-1", "해당 게시물을 찾을 수 없습니다."));
 
         // 해당 게시물의 이미지 리스트 조회
         List<String> imageUrls = postImageRepository.findAllByPostId(postId)
                 .stream()
-                .map(PostImage::getPostImage) // PostImage 엔티티에서 이미지 경로 추출
+                .map(PostImage::getImageUrl) // PostImage 엔티티에서 이미지 경로 추출
                 .toList();
 
         // 해당 게시물의 거래 가능 일정 조회
         List<PostAvailability> availabilities = postAvailabilityRepository.findAllByPostId(postId);
 
-        return new PostResponse(post,imageUrls,availabilities);
+        return new PostResponse(post,imageUrls,availabilities);*/
+        return null;
     }
 
     @Transactional
@@ -135,7 +136,7 @@ public class PostServiceImpl implements PostService {
             List<PostImage> images = request.getImages().stream()
                     .map(image -> PostImage.builder()
                             .post(post)
-                            .postImage(image)
+                            .imageUrl(image)
                             .build())
                     .toList();
             postImageRepository.saveAll(images);
@@ -150,12 +151,13 @@ public class PostServiceImpl implements PostService {
         // 수정된 게시물 반환
         List<String> imageUrls = postImageRepository.findAllByPostId(postId)
                 .stream()
-                .map(PostImage::getPostImage)
+                .map(PostImage::getImageUrl)
                 .toList();
 
         List<PostAvailability> availabilities = postAvailabilityRepository.findAllByPostId(postId);
 
-        return new PostResponse(post, imageUrls, availabilities);
+//        return new PostResponse(post, imageUrls, availabilities);
+        return null;
     }
 
     private void savePostAvailabilities(Post post, List<PostAvailabilityRequest> availabilities) {
@@ -175,8 +177,8 @@ public class PostServiceImpl implements PostService {
     @Transactional
     @Override
     public Page<PostResponse> searchPosts(PostSearchRequest request, Pageable pageable) {
-        Page<Post> posts = postQueryRepository.searchPosts(request, pageable);
-        return posts.map(PostResponse::new);
+//        Page<Post> posts = postQueryRepository.searchPosts(request, pageable);
+        return postQueryRepository.searchPosts(request, pageable);
     }
 
     // 예약에 필요한 메서드
