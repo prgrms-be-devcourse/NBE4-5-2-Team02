@@ -62,7 +62,7 @@ public class User {
     private Double longitude; // 경도
 
     @Column(nullable = true)
-    private boolean additionalInfoRequired = true; // 추가 정보 필요 플래그
+    private Boolean additionalInfoRequired = true; // 추가 정보 필요 플래그
 
     @Column(nullable = true)
     private String profileImage; // 사용자 프로필 이미지, uuid로 저장

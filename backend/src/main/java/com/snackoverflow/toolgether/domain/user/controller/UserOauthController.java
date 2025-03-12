@@ -63,14 +63,19 @@ public class UserOauthController {
             }
 
             User socialUser = oauthService.createSocialUser(userInfo);
+
+            log.info("test : {}", socialUser.getEmail());
+
             setJwtToken(response, email);
             return new RsData<>(
                     "201-1",
                     "신규 회원 가입 완료 - 추가 정보 입력 필요",
-                    Map.of("additionalInfoRequired", socialUser.isAdditionalInfoRequired())
+                    Map.of("additionalInfoRequired", socialUser.getAdditionalInfoRequired())
             );
         } catch (Exception e) {
-            throw new RuntimeException("액세스 토큰 추출 중 오류 발생!");
+            log.error("OAuth 로그인 처리 중 오류 발생!", e); // 상세 오류 로깅
+            throw new RuntimeException("OAuth 로그인 처리 중 오류 발생: " + e.getMessage(), e);
+//            throw new RuntimeException("액세스 토큰 추출 중 오류 발생!");
         }
     }
 
