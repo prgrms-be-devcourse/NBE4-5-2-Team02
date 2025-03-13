@@ -3,6 +3,8 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import "./Detail.css";
+import { fetchWithAuth } from "@/app/lib/util/fetchWithAuth";
 
 interface Reservation {
   id: number;
@@ -35,6 +37,8 @@ interface me {
     detailAddress: string;
     zipcode: string;
   };
+  latitude: number;
+  longitude: number;
   createdAt: string;
   score: number;
   credit: number;
@@ -101,10 +105,11 @@ function RequestedStatus({
     setShowConfirmModal(false); // 확인 모달 닫기
     if (actionType === "approve") {
       try {
-        const response = await fetch(
+        const response = await fetchWithAuth(
           `http://localhost:8080/api/v1/reservations/${reservation.id}/approve`,
           {
             method: "PATCH",
+            credentials: "include",
           }
         );
         if (response.ok) {
@@ -125,12 +130,13 @@ function RequestedStatus({
       }
 
       try {
-        const response = await fetch(
+        const response = await fetchWithAuth(
           `http://localhost:8080/api/v1/reservations/${
             reservation.id
           }/reject?reason=${encodeURIComponent(rejectionReason)}`,
           {
             method: "PATCH",
+            credentials: "include",
           }
         );
         if (response.ok) {
@@ -147,10 +153,11 @@ function RequestedStatus({
     } else if (actionType === "cancel") {
       // 취소 로직
       try {
-        const response = await fetch(
+        const response = await fetchWithAuth(
           `http://localhost:8080/api/v1/reservations/${reservation.id}/cancel`,
           {
             method: "PATCH",
+            credentials: "include",
           }
         );
         if (response.ok) {
@@ -223,8 +230,11 @@ function RequestedStatus({
       ) : null}
       {/* 확인 모달 */}
       {showConfirmModal && (
-        <div className="fixed inset-0 flex justify-center items-center bg-transparent backdrop-filter backdrop-blur-lg">
-          <div className="bg-white p-4 rounded-lg">
+        <div
+          className="fixed inset-0 flex justify-center items-center bg-transparent backdrop-filter backdrop-blur-lg"
+          id="modal"
+        >
+          <div className="flex flex-col items-center bg-white p-4 rounded-lg w-80">
             <p>{modalMessage}</p>
             {actionType === "reject" && (
               <div>
@@ -237,23 +247,28 @@ function RequestedStatus({
                 />
               </div>
             )}
-            <button
-              className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-[50%]"
-              onClick={confirmAction}
-            >
-              예
-            </button>
-            <button
-              className="mt-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-[50%]"
-              onClick={() => setShowConfirmModal(false)}
-            >
-              아니오
-            </button>
+            <div className="flex w-full justify-between">
+              <button
+                className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-[45%]"
+                onClick={confirmAction}
+              >
+                예
+              </button>
+              <button
+                className="mt-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-[45%]"
+                onClick={() => setShowConfirmModal(false)}
+              >
+                아니오
+              </button>
+            </div>
           </div>
         </div>
       )}
       {showModal && renter && (
-        <div className="fixed inset-0 flex justify-center items-center bg-transparent backdrop-filter backdrop-blur-lg">
+        <div
+          className="fixed inset-0 flex justify-center items-center bg-transparent backdrop-filter backdrop-blur-lg"
+          id="modal"
+        >
           <div className="relative p-8 bg-white w-1/2 rounded-lg">
             <h2 className="text-2xl font-bold mb-4">{renter.nickname} 정보</h2>
             <p>이메일: {renter.email}</p>
@@ -395,8 +410,9 @@ function InProgressStatus({
     }
 
     try {
-      const response = await fetch(apiUrl, {
+      const response = await fetchWithAuth(apiUrl, {
         method: "PATCH",
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -653,28 +669,149 @@ function CancelledStatus({ reservation }: { reservation: Reservation }) {
   );
 }
 
-export default function ClientPage({
-  reservation,
-  deposit,
-  me,
-}: {
-  reservation: Reservation;
-  deposit: Deposit;
-  me: me;
-}) {
+export default function ClientPage({ rid }: { rid: number }) {
   const [renter, setRenter] = useState<me | null>(null);
   const [owner, setOwner] = useState<me | null>(null);
+  const [me, setMe] = useState<me>({
+    id: 0,
+    nickname: "",
+    username: "",
+    profileImage: "",
+    email: "",
+    phoneNumber: "",
+    address: {
+      mainAddress: "",
+      detailAddress: "",
+      zipcode: "",
+    },
+    latitude: 0,
+    longitude: 0,
+    createdAt: "",
+    score: 0,
+    credit: 0,
+  });
+
+  const [reservation, setReservation] = useState<Reservation>({
+    id: 0,
+    status: "",
+    postId: 0,
+    startTime: "",
+    endTime: "",
+    amount: 0,
+    rejectionReason: "",
+    ownerId: 0,
+    renterId: 0,
+  });
+
+  const [deposit, setDeposit] = useState<Deposit>({
+    id: 0,
+    status: "",
+    amount: 0,
+    returnReason: "",
+  });
+
+  //유저정보 조회
+  const getMe = async () => {
+    const getMyInfo = await fetchWithAuth(
+      "http://localhost:8080/api/v1/mypage/me",
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (getMyInfo.ok) {
+      const Data = await getMyInfo.json();
+      if (Data?.code !== "200-1") {
+        console.error(`에러가 발생했습니다. \n${Data?.msg}`);
+      }
+      setMe(Data?.data);
+      console.log("user : ", Data?.data);
+    } else {
+      console.error("Error fetching data:", getMyInfo.status);
+    }
+  };
+
+  // 예약 정보 조회
+  const getReservation = async () => {
+    const getReservationInfo = await fetchWithAuth(
+      `http://localhost:8080/api/v1/reservations/${rid}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (getReservationInfo.ok) {
+      const Data = await getReservationInfo.json();
+      if (Data?.code !== "200-1") {
+        console.error(`에러가 발생했습니다. \n${Data?.msg}`);
+      }
+      setReservation(Data?.data);
+    } else {
+      console.error("Error fetching data:", getReservationInfo.status);
+    }
+  };
+
+  // 보증금 정보 조회
+  const getDeposit = async () => {
+    const getDepositInfo = await fetchWithAuth(
+      `http://localhost:8080/api/v1/deposits/rid/${rid}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (getDepositInfo.ok) {
+      const Data = await getDepositInfo.json();
+      if (Data?.code !== "200-1") {
+        console.error(`에러가 발생했습니다. \n${Data?.msg}`);
+      }
+      setDeposit(Data?.data);
+      console.log();
+    } else {
+      console.error("Error fetching data:", getDepositInfo.status);
+    }
+  };
 
   useEffect(() => {
-    console.log("useEffect");
-    fetchRenterInfo(reservation.renterId);
-    fetchOwnerInfo(reservation.ownerId);
+    getMe();
+    getReservation();
+    getDeposit();
   }, []);
+
+  useEffect(() => {
+    if (reservation && reservation.renterId) {
+      // reservation이 null이 아니고, renterId가 있을 때만
+      fetchRenterInfo(reservation.renterId);
+    }
+    if (reservation && reservation.ownerId) {
+      // reservation이 null이 아니고, ownerId가 있을 때만
+      fetchOwnerInfo(reservation.ownerId);
+    }
+  }, [reservation]);
 
   const fetchRenterInfo = async (renterId: number) => {
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/v1/users/${renterId}`
+      const response = await fetchWithAuth(
+        `http://localhost:8080/api/v1/users/${renterId}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
       if (response.ok) {
         const data = await response.json();
@@ -690,8 +827,15 @@ export default function ClientPage({
 
   const fetchOwnerInfo = async (ownerId: number) => {
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/v1/users/${ownerId}`
+      const response = await fetchWithAuth(
+        `http://localhost:8080/api/v1/users/${ownerId}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
       if (response.ok) {
         const data = await response.json();

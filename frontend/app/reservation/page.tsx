@@ -39,8 +39,7 @@ const mockUpPost = {
     viewCount: 0,
   },
 };
-const me = mockUpUser.data;
-const post = mockUpPost.data;
+
 export default function Page() {
-  return <ClientPage me={me} post={post} />;
+  return <ClientPage />;
 }

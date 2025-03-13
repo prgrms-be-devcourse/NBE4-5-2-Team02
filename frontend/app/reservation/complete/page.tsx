@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import ClientPage from "./ClientPage";
 import { useEffect, useState } from "react";
+import { fetchWithAuth } from "@/app/lib/util/fetchWithAuth";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -13,7 +14,7 @@ export default function Page() {
 
   const fetchReservationData = async (reservationId: string) => {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `http://localhost:8080/api/v1/reservations/${reservationId}`,
         {
           method: "GET",
@@ -39,7 +40,7 @@ export default function Page() {
 
   const fetchDepositData = async (reservationId: string) => {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `http://localhost:8080/api/v1/deposits/rid/${reservationId}`,
         {
           method: "GET",
