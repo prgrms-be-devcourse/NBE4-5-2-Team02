@@ -26,7 +26,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,20 +86,21 @@ public class PostServiceImpl implements PostService {
     @Transactional
     @Override
     public PostResponse getPostById(Long postId) {
-        /*Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NotFoundException("404-1", "해당 게시물을 찾을 수 없습니다."));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("404-1", "게시물을 찾을 수 없습니다."));
 
-        // 해당 게시물의 이미지 리스트 조회
-        List<String> imageUrls = postImageRepository.findAllByPostId(postId)
-                .stream()
-                .map(PostImage::getImageUrl) // PostImage 엔티티에서 이미지 경로 추출
-                .toList();
+        // 조회수 증가
+        post.incrementViewCount();
 
-        // 해당 게시물의 거래 가능 일정 조회
-        List<PostAvailability> availabilities = postAvailabilityRepository.findAllByPostId(postId);
+        // Set<String> 이미지 경로로 변환
+        Set<String> imageUrls = post.getPostImages().stream()
+                .map(PostImage::getImageUrl)
+                .collect(Collectors.toSet());
 
-        return new PostResponse(post,imageUrls,availabilities);*/
-        return null;
+        // PostAvailability Set으로 변환
+        Set<PostAvailability> availabilities = new HashSet<>(post.getPostAvailabilities());
+
+        return new PostResponse(post, imageUrls, availabilities);
     }
 
     @Transactional

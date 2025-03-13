@@ -86,4 +86,8 @@ public class Post {
         this.longitude = longitude;
         this.viewCount = viewCount;
     }
+
+    public void incrementViewCount() {
+        this.viewCount += 1;
+    }
 }
