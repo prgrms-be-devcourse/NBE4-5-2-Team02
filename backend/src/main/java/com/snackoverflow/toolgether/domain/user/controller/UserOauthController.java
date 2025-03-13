@@ -2,8 +2,10 @@ package com.snackoverflow.toolgether.domain.user.controller;
 
 import com.snackoverflow.toolgether.domain.user.dto.request.AdditionalInfoRequest;
 import com.snackoverflow.toolgether.domain.user.entity.User;
+import com.snackoverflow.toolgether.domain.user.repository.UserRepository;
 import com.snackoverflow.toolgether.domain.user.service.OauthService;
 import com.snackoverflow.toolgether.global.dto.RsData;
+import com.snackoverflow.toolgether.global.exception.custom.user.UserNotFoundException;
 import com.snackoverflow.toolgether.global.filter.CustomUserDetails;
 import com.snackoverflow.toolgether.global.filter.Login;
 import com.snackoverflow.toolgether.global.util.JwtUtil;
@@ -13,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -25,6 +28,7 @@ import java.util.Map;
 public class UserOauthController {
 
     private final OauthService oauthService;
+    private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
     @PostMapping("/login/oauth2/code/google")
@@ -54,7 +58,8 @@ public class UserOauthController {
              * 존재하지 않는 회원이라면 추가 정보 기입으로 이동
              */
             if (oauthService.existsUser(email)) {
-                setJwtToken(response, email);
+                User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+                setJwtToken(response, user.getId());
                 return new RsData<>(
                         "200-1",
                         "기존 사용자 로그인 성공",
@@ -63,36 +68,43 @@ public class UserOauthController {
             }
 
             User socialUser = oauthService.createSocialUser(userInfo);
-
-            log.info("test : {}", socialUser.getEmail());
-
-            setJwtToken(response, email);
+            setJwtToken(response, socialUser.getId());
             return new RsData<>(
                     "201-1",
                     "신규 회원 가입 완료 - 추가 정보 입력 필요",
-                    Map.of("additionalInfoRequired", socialUser.getAdditionalInfoRequired())
+                    Map.of("additionalInfoRequired", socialUser.isAdditionalInfoRequired())
             );
         } catch (Exception e) {
-            log.error("OAuth 로그인 처리 중 오류 발생!", e); // 상세 오류 로깅
-            throw new RuntimeException("OAuth 로그인 처리 중 오류 발생: " + e.getMessage(), e);
-//            throw new RuntimeException("액세스 토큰 추출 중 오류 발생!");
+            throw new RuntimeException("액세스 토큰 추출 중 오류 발생!");
         }
     }
 
     @PatchMapping("/oauth/users/additional-info")
-    public RsData<?> updateAdditionalInfo(@Validated @RequestBody AdditionalInfoRequest request,
-                                          @Login CustomUserDetails userDetails) {
-        oauthService.updateAdditionalInfo(userDetails.getEmail(), request);
-        return new RsData<>(
-                "201-2",
-                "추가 정보가 등록되었습니다.",
-                null
-        );
+    public Mono<RsData<Object>> updateAdditionalInfo(
+            @Validated @RequestBody AdditionalInfoRequest request,
+            @Login CustomUserDetails userDetails,
+            HttpServletResponse response) {
+        return oauthService.updateAdditionalInfo(userDetails.getEmail(), request)
+                .map(isLocationValid -> {
+                    if (Boolean.FALSE.equals(isLocationValid)) {
+                        log.debug("isLocationValid: {}", isLocationValid);
+                        return new RsData<>(
+                                "400-1",
+                                "위치 정보가 허용 범위를 벗어났습니다.",
+                                null);
+                    }
+                    setJwtToken(response, userDetails.getUserId());
+                    return new RsData<>(
+                            "201-2",
+                            "추가 정보가 등록되었습니다.",
+                            null);
+                });
     }
 
-    private void setJwtToken(HttpServletResponse response, String email) {
+    // 토큰 이메일 기반 -> userId 기반으로 변경
+    private void setJwtToken(HttpServletResponse response, Long userId) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("email", email);
+        claims.put("userId", userId);
         String token = jwtUtil.createToken(claims);
         jwtUtil.setJwtInCookie(token, response);
     }
