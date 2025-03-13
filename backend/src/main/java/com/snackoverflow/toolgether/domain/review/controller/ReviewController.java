@@ -5,6 +5,7 @@ import com.snackoverflow.toolgether.domain.reservation.entity.Reservation;
 import com.snackoverflow.toolgether.domain.reservation.entity.ReservationStatus;
 import com.snackoverflow.toolgether.domain.reservation.service.ReservationService;
 import com.snackoverflow.toolgether.domain.review.dto.request.ReviewRequest;
+import com.snackoverflow.toolgether.domain.review.entity.Review;
 import com.snackoverflow.toolgether.domain.review.service.ReviewService;
 import com.snackoverflow.toolgether.domain.user.entity.User;
 import com.snackoverflow.toolgether.domain.user.service.UserService;
@@ -49,14 +50,14 @@ public class ReviewController {
                     "대여 완료 후 리뷰를 작성할 수 있습니다."
             );
         }
-        if (reviewService.findByUserIdAndReservationId(actualReservation.getId(), user.getId()).isPresent()) {
+        Optional<Review> temp = reviewService.findByUserIdAndReservationId(actualReservation.getId(), user.getId());
+        if (reviewService.existsUserIdAndReservationId(user.getId(), actualReservation.getId())) { // 수정: existsUserIdAndReservationId 사용
             return new RsData<>(
                     "409-1",
                     "이미 작성한 리뷰가 존재합니다"
             );
         }
         reviewService.create(reviewRequest, actualReservation, user);
-
         return new RsData<>(
                 "200-1",
                 "리뷰가 완료되었습니다"

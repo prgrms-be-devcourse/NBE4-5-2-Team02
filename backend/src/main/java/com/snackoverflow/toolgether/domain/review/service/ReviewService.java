@@ -14,19 +14,27 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ReviewService {
     private final ReviewRepository reviewRepository;
 
     //해당 예약에 유저가 작성한 리뷰 조회
+    @Transactional(readOnly = true)
     public Optional<Review> findByUserIdAndReservationId(Long userId, Long reservationId) {
         return reviewRepository.findByReviewerIdAndReservationId(userId, reservationId);
     }
 
+    @Transactional(readOnly = true)
+    public boolean existsUserIdAndReservationId(Long userId, Long reservationId) {
+        return reviewRepository.existsByReviewerIdAndReservationId(userId, reservationId); // 수정: existsBy 메서드 사용
+    }
+
+    @Transactional
     public void create(ReviewRequest reviewRequest, Reservation reservation, User user) {
-        User reviewee = reservation.getRenter() == user ? reservation.getOwner() : reservation.getRenter();
+        User reviewee = reservation.getRenter().getId() == user.getId() ? reservation.getOwner() : reservation.getRenter();
+        User reviewer = user; // 리뷰어는 항상 현재 사용자
+
         Review review = Review.builder()
-                .reviewer(user)
+                .reviewer(reviewer)
                 .reviewee(reviewee)
                 .reservation(reservation)
                 .productScore(reviewRequest.getProductScore())

@@ -66,12 +66,15 @@ public class BaseInitData {
         if(userRepository.count() > 0) {
 			return;
 		}
+		// 비밀번호 암호화
+		String password1 = "password123";
+		password1 = passwordEncoder.encode(password1);
 		User user1 = User.builder()
 			.address(new Address("서울", "강남구", "12345")) // Address 객체 생성 및 설정
 			.username("human123")
 			.nickname("사람이")
 			.email("human123@gmail.com")
-			.password("1234")
+			.password(password1)
 			.score(30)
 			.phoneNumber("01012345678")
 			.latitude(37.5665)
@@ -89,12 +92,15 @@ public class BaseInitData {
 			.longitude(126.9780)
 			.build());
 
+		String password2 = "password123";
+		password2 = passwordEncoder.encode(password2);
+
 		User user2 = User.builder()
 			.address(new Address("부산", "해운대구", "67890"))
 			.username("seaman222")
 			.nickname("바다사람")
 			.email("seaman222@gmail.com")
-			.password("5678")
+			.password(password2)
 			.score(50)
 			.phoneNumber("01098765432")
 			.latitude(35.1587)
