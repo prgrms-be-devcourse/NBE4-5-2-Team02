@@ -8,7 +8,6 @@ import com.snackoverflow.toolgether.domain.review.service.ReviewService;
 import com.snackoverflow.toolgether.domain.user.dto.MeInfoResponse;
 import com.snackoverflow.toolgether.domain.user.dto.MyReservationInfoResponse;
 import com.snackoverflow.toolgether.domain.user.dto.request.PatchMyInfoRequest;
-import com.snackoverflow.toolgether.domain.user.dto.request.ProfileRequest;
 import com.snackoverflow.toolgether.domain.user.entity.User;
 import com.snackoverflow.toolgether.domain.user.service.UserService;
 import com.snackoverflow.toolgether.global.dto.RsData;
@@ -70,7 +69,7 @@ public class MypageController {
                     String imageUrl = null;
                     List<PostImage> images = postImageService.getPostImagesByPostId(reservation.getPost().getId());  //PostImageService 호출
                     if (images != null && !images.isEmpty()) {
-                        imageUrl = images.get(0).getPostImage();
+                        imageUrl = images.get(0).getImageUrl();
                     }
                     boolean isReviewed = reviewService.findByUserIdAndReservationId(userId, reservation.getId()).isPresent();
 
@@ -83,7 +82,7 @@ public class MypageController {
                     String imageUrl = null;
                     List<PostImage> images = postImageService.getPostImagesByPostId(reservation.getPost().getId());  //PostImageService 호출
                     if (images != null && !images.isEmpty()) {
-                        imageUrl = images.get(0).getPostImage();
+                        imageUrl = images.get(0).getImageUrl();
                     }
                     boolean isReviewed = reviewService.findByUserIdAndReservationId(userId, reservation.getId()).isPresent();
                     return MyReservationInfoResponse.from(reservation, imageUrl, isReviewed);
@@ -105,7 +104,6 @@ public class MypageController {
     @PostMapping("/profile")
     public RsData<Void> postProfileimage(
             @Login CustomUserDetails customUserDetails,
-            @Validated ProfileRequest profileRequest,
             @RequestParam("profileImage") MultipartFile profileImage
     ) {
         String username = customUserDetails.getUsername();
