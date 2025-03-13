@@ -18,13 +18,16 @@ import com.snackoverflow.toolgether.domain.post.entity.Post;
 import com.snackoverflow.toolgether.domain.post.repository.PostRepository;
 import com.snackoverflow.toolgether.domain.post.service.PostService;
 import com.snackoverflow.toolgether.domain.user.entity.User;
+import com.snackoverflow.toolgether.global.util.s3.S3Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,13 +38,14 @@ public class PostServiceImpl implements PostService {
     private final PostImageRepository postImageRepository;
     private final PostAvailabilityRepository postAvailabilityRepository;
     private final UserRepository userRepository;
+    private final S3Service s3Service;
 
     @Transactional
     @Override
-    public PostResponse createPost(PostCreateRequest request) {
+    public PostResponse createPost(User user,PostCreateRequest request, List<MultipartFile> images) {
         // 임시로 user_id=1 사용 (실제 로직에서는 인증된 사용자 정보 가져오기)
-        User user = userRepository.findById(1L)
-                .orElseThrow(() -> new NotFoundException("404-1", "사용자를 찾을 수 없습니다."));
+//        User user = userRepository.findById(1L)
+//                .orElseThrow(() -> new NotFoundException("404-1", "사용자를 찾을 수 없습니다."));
 
         if (request.getTitle() == null || request.getTitle().isBlank()) {
             throw new BadRequestException("400-1", "제목은 필수 입력값입니다.");
@@ -61,15 +65,15 @@ public class PostServiceImpl implements PostService {
 
         postRepository.save(post);
 
-        // 이미지 저장
-        List<PostImage> images = request.getImages().stream()
-                .map(image -> PostImage.builder()
+        // S3 이미지 업로드 후 저장
+        List<PostImage> postImages = images.stream()
+                .map(file -> PostImage.builder()
                         .post(post)
-                        .imageUrl(image)
+                        .imageUrl(s3Service.upload(file, "post-images"))
                         .build())
-                .toList();
+                .collect(Collectors.toList());
 
-        postImageRepository.saveAll(images);
+        postImageRepository.saveAll(postImages);
 
         // 거래 가능 일정 저장
         savePostAvailabilities(post, request.getAvailabilities());
