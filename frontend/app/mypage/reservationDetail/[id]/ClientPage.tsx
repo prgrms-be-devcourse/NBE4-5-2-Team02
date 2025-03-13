@@ -44,6 +44,14 @@ interface me {
   credit: number;
 }
 
+interface post {
+  id: number;
+  userId: number;
+  title: string;
+  priceType: string;
+  price: number;
+}
+
 function formatDate(dateTimeString: string | number | Date) {
   const date = new Date(dateTimeString);
   const options = {
@@ -64,11 +72,13 @@ function RequestedStatus({
   deposit,
   me,
   renter,
+  post,
 }: {
   reservation: Reservation;
   deposit: Deposit;
   me: me;
   renter: me;
+  post: post;
 }) {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false); // 추가: 승인/거절 확인 모달
@@ -191,11 +201,10 @@ function RequestedStatus({
           <p className="text-4xl font-bold text-green-600 mb-4">
             예약을 확인 중입니다
           </p>
-          <p className="text-lg mb-2">예약이 확정되면 알림으로 알려드릴게요!</p>
         </>
       ) : null}
 
-      <p className="text-lg mb-2 font-bold">제품명 {reservation.postId}</p>
+      <p className="text-lg mb-2 font-bold">{post.title}</p>
       <p className="text-lg mb-2">
         {formatDate(reservation.startTime)} ~ {formatDate(reservation.endTime)}
       </p>
@@ -293,11 +302,13 @@ function ApprovedStatus({
   deposit,
   me,
   owner,
+  post,
 }: {
   reservation: Reservation;
   deposit: Deposit;
   me: me;
   owner: me;
+  post: post;
 }) {
   const [showModal, setShowModal] = useState<boolean>(false);
 
@@ -314,7 +325,7 @@ function ApprovedStatus({
         예약이 확정되었습니다!
       </p>
       <p className="text-lg mb-2">즐거운 이용 되세요!</p>
-      <p className="text-lg mb-2 font-bold">제품명 {reservation.postId}</p>
+      <p className="text-lg mb-2 font-bold">{post.title}</p>
       <p className="text-lg mb-2">
         {formatDate(reservation.startTime)} ~ {formatDate(reservation.endTime)}
       </p>
@@ -363,9 +374,11 @@ function ApprovedStatus({
 function InProgressStatus({
   reservation,
   deposit,
+  post,
 }: {
   reservation: Reservation;
   deposit: Deposit;
+  post: post;
 }) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -432,7 +445,7 @@ function InProgressStatus({
       <p className="text-5xl font-bold text-yellow-600 mb-4">⏳</p>
       <p className="text-4xl font-bold text-yellow-600 mb-4">이용 중입니다</p>
       <p className="text-lg mb-2">이용이 완료되면 반납해주세요!</p>
-      <p className="text-lg mb-2 font-bold">제품명 {reservation.postId}</p>
+      <p className="text-lg mb-2 font-bold">{post.title}</p>
       <p className="text-lg mb-2">
         {formatDate(reservation.startTime)} ~ {formatDate(reservation.endTime)}
       </p>
@@ -622,9 +635,11 @@ function FailedStatus({
 function DoneStatus({
   reservation,
   deposit,
+  post,
 }: {
   reservation: Reservation;
   deposit: Deposit;
+  post: post;
 }) {
   const router = useRouter(); // useRouter 훅 사용
 
@@ -639,7 +654,7 @@ function DoneStatus({
         이용이 완료되었습니다
       </p>
       <p className="text-lg mb-2">이용해주셔서 감사합니다.</p>
-      <p className="text-lg mb-2 font-bold">제품명 {reservation.postId}</p>
+      <p className="text-lg mb-2 font-bold">{post.title}</p>
       <p className="text-lg mb-2">
         {formatDate(reservation.startTime)} ~ {formatDate(reservation.endTime)}
       </p>
@@ -690,7 +705,6 @@ export default function ClientPage({ rid }: { rid: number }) {
     score: 0,
     credit: 0,
   });
-
   const [reservation, setReservation] = useState<Reservation>({
     id: 0,
     status: "",
@@ -702,12 +716,18 @@ export default function ClientPage({ rid }: { rid: number }) {
     ownerId: 0,
     renterId: 0,
   });
-
   const [deposit, setDeposit] = useState<Deposit>({
     id: 0,
     status: "",
     amount: 0,
     returnReason: "",
+  });
+  const [post, setPost] = useState<post>({
+    id: 0,
+    userId: 0,
+    title: "",
+    priceType: "",
+    price: 0,
   });
 
   //유저정보 조회
@@ -799,6 +819,9 @@ export default function ClientPage({ rid }: { rid: number }) {
       // reservation이 null이 아니고, ownerId가 있을 때만
       fetchOwnerInfo(reservation.ownerId);
     }
+    if (reservation && reservation.postId) {
+      getPost(reservation.postId);
+    }
   }, [reservation]);
 
   const fetchRenterInfo = async (renterId: number) => {
@@ -849,6 +872,30 @@ export default function ClientPage({ rid }: { rid: number }) {
     }
   };
 
+  const getPost = async (postid: number) => {
+    const getPostInfo = await fetchWithAuth(
+      `http://localhost:8080/api/v1/reservations/post/${postid}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (getPostInfo.ok) {
+      const Data = await getPostInfo.json();
+      if (Data?.code !== "200-1") {
+        console.error(`에러가 발생했습니다. \n${Data?.msg}`);
+      }
+      setPost(Data?.data);
+      console.log("data : ", Data?.data);
+    } else {
+      console.error("Error fetching data:", getPostInfo.status);
+    }
+  };
+
   const router = useRouter();
 
   const goToMyPage = () => {
@@ -863,6 +910,7 @@ export default function ClientPage({ rid }: { rid: number }) {
           deposit={deposit}
           me={me}
           renter={renter}
+          post={post}
         />
       )}
       {reservation.status === "APPROVED" && (
@@ -871,10 +919,15 @@ export default function ClientPage({ rid }: { rid: number }) {
           deposit={deposit}
           me={me}
           owner={owner}
+          post={post}
         />
       )}
       {reservation.status === "IN_PROGRESS" && (
-        <InProgressStatus reservation={reservation} deposit={deposit} />
+        <InProgressStatus
+          reservation={reservation}
+          deposit={deposit}
+          post={post}
+        />
       )}
       {reservation.status === "REJECTED" && (
         <RejectedStatus
@@ -885,7 +938,7 @@ export default function ClientPage({ rid }: { rid: number }) {
         />
       )}
       {reservation.status === "DONE" && (
-        <DoneStatus reservation={reservation} deposit={deposit} />
+        <DoneStatus reservation={reservation} deposit={deposit} post={post} />
       )}
       {reservation.status === "FAILED_OWNER_ISSUE" && (
         <FailedStatus

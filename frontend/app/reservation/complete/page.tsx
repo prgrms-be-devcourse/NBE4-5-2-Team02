@@ -58,8 +58,6 @@ export default function Page() {
     priceType: "",
     price: 0,
   });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const getReservation = async (reservationId: string) => {
     const getReservationInfo = await fetchWithAuth(
