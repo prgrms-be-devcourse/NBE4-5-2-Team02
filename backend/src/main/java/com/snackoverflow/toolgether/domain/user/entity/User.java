@@ -3,7 +3,6 @@ package com.snackoverflow.toolgether.domain.user.entity;
 import com.snackoverflow.toolgether.domain.user.dto.request.PatchMyInfoRequest;
 import com.snackoverflow.toolgether.global.util.Util;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -62,10 +61,10 @@ public class User {
     private Double longitude; // 경도
 
     @Column(nullable = true)
-    private Boolean additionalInfoRequired = true; // 추가 정보 필요 플래그
+    private boolean additionalInfoRequired = true; // 추가 정보 필요 플래그
 
     @Column(nullable = true)
-    private String profileImage; // 사용자 프로필 이미지, uuid로 저장
+    private String profileImage; // 사용자 프로필 이미지 링크 저장
 
     @Builder.Default
     private int score = 30; // 유저 평가 정보: 기본값 30점
@@ -103,10 +102,6 @@ public class User {
                 .mainAddress(mainAddress)
                 .detailAddress(detailAddress)
                 .build();
-    }
-
-    public void updateEmail(String email) {
-        this.email = email;
     }
 
     public void updateNickname(String nickname) {
