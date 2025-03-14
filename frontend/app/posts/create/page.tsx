@@ -16,14 +16,14 @@ interface IAddr {
 export default function CreatePostPage() {
   const router = useRouter();
 
-  // ✅ 게시물 입력 상태
+  // 게시물 입력 상태
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("ELECTRONICS");
   const [priceType, setPriceType] = useState("DAY");
   const [price, setPrice] = useState("");
 
-  const [address, setAddress] = useState(""); // ✅ 주소 상태 추가
+  const [address, setAddress] = useState(""); // 주소 상태 추가
   const [zipCode, setZipCode] = useState(""); // 우편번호
   const [addressDetail, setAddressDetail] = useState(""); // 상세 주소
   const [latitude, setLatitude] = useState("");
@@ -40,11 +40,11 @@ export default function CreatePostPage() {
   const [images, setImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // ✅ 카테고리 및 가격 타입 옵션
+  // 카테고리 및 가격 타입 옵션
   const categoryOptions = ["ELECTRONICS", "TOOL"];
   const priceTypeOptions = ["HOUR", "DAY"];
 
-  // ✅ 이용 가능 시간 추가 핸들러
+  // 이용 가능 시간 추가 핸들러
   const addAvailability = () => {
     setAvailabilities([
       ...availabilities,
@@ -58,14 +58,14 @@ export default function CreatePostPage() {
     ]);
   };
 
-  // ✅ 이용 가능 시간 삭제 핸들러
+  // 이용 가능 시간 삭제 핸들러
   const removeAvailability = (index: number) => {
     if (availabilities.length === 1) return; // 첫 번째 시간은 삭제 불가능
     const updatedAvailabilities = availabilities.filter((_, i) => i !== index);
     setAvailabilities(updatedAvailabilities);
   };
 
-  // ✅ 이미지 업로드 핸들러 (최대 3개 제한)
+  // 이미지 업로드 핸들러 (최대 3개 제한)
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFiles = Array.from(e.target.files);
@@ -79,13 +79,13 @@ export default function CreatePostPage() {
     }
   };
 
-  // ✅ 이미지 삭제 핸들러
+  // 이미지 삭제 핸들러
   const removeImage = (index: number) => {
     const updatedImages = images.filter((_, i) => i !== index);
     setImages(updatedImages);
   };
 
-  // ✅ 이용 가능 시간 변경 핸들러
+  // 이용 가능 시간 변경 핸들러
   const handleAvailabilityChange = (
     index: number,
     field: string,
@@ -104,7 +104,7 @@ export default function CreatePostPage() {
             : 0,
         };
       } else if (field === "date") {
-        // ✅ UI에서는 YYYY-MM-DD로 저장, 실제 저장 시 T00:00:00 추가
+        // UI에서는 YYYY-MM-DD로 저장, 실제 저장 시 T00:00:00 추가
         updatedAvailabilities[index] = {
           ...updatedAvailabilities[index],
           date: value ? `${value}T00:00:00` : "", // 저장할 때만 T00:00:00 추가
@@ -120,7 +120,7 @@ export default function CreatePostPage() {
     });
   };
 
-  // ✅ 게시물 등록 요청 핸들러
+  // 게시물 등록 요청 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -140,16 +140,16 @@ export default function CreatePostPage() {
         availabilities,
       };
 
-      // ✅ Blob으로 변환 (Content-Type: application/json)
+      // Blob으로 변환 (Content-Type: application/json)
       const jsonBlob = new Blob([JSON.stringify(requestData)], {
         type: "application/json",
       });
       formData.append("request", jsonBlob);
 
-      // ✅ 이미지 파일 추가
+      // 이미지 파일 추가
       images.forEach((image) => formData.append("images", image));
 
-      // ✅ API 요청
+      // API 요청
       const response = await fetch("http://localhost:8080/api/v1/posts", {
         method: "POST",
         credentials: "include",
@@ -170,11 +170,11 @@ export default function CreatePostPage() {
   const onClickAddr = () => {
     new window.daum.Postcode({
       oncomplete: function (data: IAddr) {
-        setAddress(data.address); // ✅ 주소 상태 업데이트
-        setZipCode(data.zonecode); // ✅ 우편번호 상태 업데이트
+        setAddress(data.address); // 주소 상태 업데이트
+        setZipCode(data.zonecode); // 우편번호 상태 업데이트
         document.getElementById("addrDetail")?.focus(); // ✅ 상세 주소 입력 필드로 자동 포커스
 
-        // ✅ 주소 → 위도/경도 변환 요청
+        // 주소 → 위도/경도 변환 요청
         fetchCoordsFromAddress(data.address);
       },
     }).open();
@@ -195,7 +195,7 @@ export default function CreatePostPage() {
       );
         const data = await response.json();
         
-        console.log("카카오 API 응답:", data); // ✅ 전체 응답을 확인!
+        console.log("카카오 API 응답:", data); // 전체 응답을 확인
         console.log("키 확인 : ",process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY);
 
       if (data.documents.length > 0) {
@@ -298,7 +298,7 @@ export default function CreatePostPage() {
           />
         </div>
 
-        {/* ✅ 이용 가능 시간 추가 */}
+        {/* 이용 가능 시간 추가 */}
         <div className="mb-4">
           <label className="block text-gray-700 font-semibold mb-2">
             이용 가능 시간
@@ -308,12 +308,12 @@ export default function CreatePostPage() {
               key={index}
               className="border p-4 rounded-lg mb-4 shadow-sm bg-gray-50"
             >
-              {/* ✅ 단순 이용 가능 시간 (날짜, 시작시간, 종료시간) */}
+              {/* 단순 이용 가능 시간 (날짜, 시작시간, 종료시간) */}
               <div className="flex flex-col gap-2 mb-2">
                 {!a.isRecurring && (
                   <input
                     type="date"
-                    value={a.date ? a.date.split("T")[0] : ""} // ✅ T00:00:00 제거하고 UI에 표시
+                    value={a.date ? a.date.split("T")[0] : ""} // T00:00:00 제거하고 UI에 표시
                     onChange={(e) =>
                       handleAvailabilityChange(index, "date", e.target.value)
                     }
@@ -347,7 +347,7 @@ export default function CreatePostPage() {
                 />
               </div>
 
-              {/* ✅ 반복 여부 선택 */}
+              {/* 반복 여부 선택 */}
               <div className="flex items-center gap-2 mb-2">
                 <input
                   type="checkbox"
@@ -364,7 +364,7 @@ export default function CreatePostPage() {
                 <span className="text-gray-700">매 주 가능</span>
               </div>
 
-              {/* ✅ 반복 예약인 경우 요일 선택 */}
+              {/* 반복 예약인 경우 요일 선택 */}
               {a.isRecurring && (
                 <div className="flex flex-wrap gap-2">
                   {[
@@ -397,7 +397,7 @@ export default function CreatePostPage() {
                 </div>
               )}
 
-              {/* ✅ 삭제 버튼 (첫 번째 시간 제외) */}
+              {/* 삭제 버튼 (첫 번째 시간 제외) */}
               {index > 0 && (
                 <button
                   type="button"
@@ -418,7 +418,7 @@ export default function CreatePostPage() {
           </button>
         </div>
 
-        {/* ✅ 이미지 업로드 버튼 및 리스트 */}
+        {/* 이미지 업로드 버튼 및 리스트 */}
         <div className="mb-4">
           <label className="block text-gray-700 font-semibold mb-2">
             이미지 업로드 (최대 3개)
@@ -432,7 +432,7 @@ export default function CreatePostPage() {
             id="fileInput"
           />
 
-          {/* ✅ 커스텀 업로드 버튼 */}
+          {/* 커스텀 업로드 버튼 */}
           <label
             htmlFor="fileInput"
             className="block w-full bg-blue-500 text-white text-center py-2 rounded-lg cursor-pointer hover:bg-blue-600"
@@ -440,7 +440,7 @@ export default function CreatePostPage() {
             이미지 선택
           </label>
 
-          {/* ✅ 업로드된 이미지 파일명 표시 */}
+          {/* 업로드된 이미지 파일명 표시 */}
           <div className="mt-2">
             {images.map((image, index) => (
               <div
@@ -485,7 +485,7 @@ export default function CreatePostPage() {
               검색
             </button>
           </div>
-          {/* ✅ 우편번호 & 상세 주소 입력 */}
+          {/* 우편번호 & 상세 주소 입력 */}
           <div className="mt-2 flex gap-2">
             <input
               id="zipNo"
