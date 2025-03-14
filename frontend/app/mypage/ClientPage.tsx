@@ -74,7 +74,7 @@ export default function ClientPage() {
     createdAt: "",
     score: 0,
     credit: 0,
-  })
+  });
   const [reservations, setReservations] = useState<Reservations>({
     rentals: [
       {
@@ -111,7 +111,7 @@ export default function ClientPage() {
   );
   const [isCancelButton, setIsCancelButton] = useState(true);
 
-  const BASE_URL = 'http://localhost:8080';
+  const BASE_URL = "http://localhost:8080";
 
   const localizer = momentLocalizer(moment);
 
@@ -273,7 +273,7 @@ export default function ClientPage() {
     } else {
       console.error("Error fetching data:", getMyReservations.status);
     }
-  }
+  };
 
   //폼 데이터를 서버로 전송하는 함수
   const handleUploadProfile = async (
@@ -597,8 +597,9 @@ export default function ClientPage() {
               <div>
                 {filteredReservations.length > 0 ? (
                   filteredReservations.map((reservation) => (
-                    <div
-                      key={reservation.id}
+                    <Link href={`/mypage/reservationDetail/${reservation.id}`}
+                      key={1}
+                      // key={reservation.id}
                       className="flex items-center border rounded p-2 mb-2"
                     >
                       <Image
@@ -632,7 +633,7 @@ export default function ClientPage() {
                           상태: {reservationStatus[reservation.status] || ""}
                         </p>
                       </div>
-                    </div>
+                    </Link>
                   ))
                 ) : (
                   <p>예약 내역이 없습니다.</p>

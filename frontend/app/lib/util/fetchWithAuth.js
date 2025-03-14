@@ -18,7 +18,7 @@ const refreshAccessToken = async () => {
     } catch (error) {
         console.error('토큰 갱신 실패:', error);
         sessionStorage.removeItem('access_token'); // 만료된 액세스 토큰 제거
-        window.location.href = '/login'; // 로그인 페이지로 리디렉션
+        // window.location.href = '/login'; // 로그인 페이지로 리디렉션
     }
 };
 
