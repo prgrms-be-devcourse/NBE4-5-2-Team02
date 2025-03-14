@@ -53,6 +53,7 @@ export default function PostsPage() {
   // 게시물 상태값
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
+
   const [error, setError] = useState("");
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -72,7 +73,7 @@ export default function PostsPage() {
   const priceTypeOptions = ["HOUR", "DAY"]; // 가격 타입
   const categoryOptions = ["TOOL", "ELECTRONICS"]; // 카테고리
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
   // 필터 변경 시 URL 업데이트 & 즉시 API 호출
   const updateSearchParams = () => {
@@ -140,7 +141,8 @@ export default function PostsPage() {
     setLoading(true);
 
     try {
-      const url = new URL(`${API_BASE_URL}/api/v1/posts/search`);
+      const url = new URL(`${BASE_URL}/api/v1/posts/search`);
+
       url.searchParams.append("page", pageNumber.toString());
       if (searchQuery) url.searchParams.append("keyword", searchQuery);
 
@@ -171,6 +173,7 @@ export default function PostsPage() {
         const filteredNewPosts = newPosts.filter(
           (post) => !existingIds.has(post.id)
         );
+
         return [...prevPosts, ...filteredNewPosts];
       });
 
@@ -366,4 +369,6 @@ export default function PostsPage() {
       </div>
     </motion.div>
   );
+
 }
+

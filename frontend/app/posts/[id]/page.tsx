@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 interface Availability {
@@ -35,13 +36,14 @@ export default function PostDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
   useEffect(() => {
     const fetchPostDetail = async () => {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/api/v1/posts/${id}`,
+          `${BASE_URL}/api/v1/posts/${id}`,
+
           {
             method: "GET",
             credentials: "include",
@@ -88,6 +90,7 @@ export default function PostDetailPage() {
     return (
       <p className="text-gray-600 text-center py-10">게시물을 불러오는 중...</p>
     );
+
   if (error) return <p className="text-red-600 text-center py-10">{error}</p>;
 
   return (
@@ -190,7 +193,6 @@ export default function PostDetailPage() {
             </table>
           </div>
         </div>
-
         {/* 예약 및 수정 버튼 */}
         <div className="mt-6 flex justify-between">
           {/* 수정하기 버튼 (현재는 동작 없음) */}
