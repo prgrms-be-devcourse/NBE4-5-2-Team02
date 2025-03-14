@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import Script from 'next/script';
 
-interface Window {
-  daum: any;
-}
+// interface Window {
+//   daum: any;
+// }
 
 interface IAddr {
   address: string;
@@ -174,12 +175,12 @@ export default function CreatePostPage() {
       oncomplete: function (data: IAddr) {
         setAddress(data.address); // 주소 상태 업데이트
         setZipCode(data.zonecode); // 우편번호 상태 업데이트
-        
         document.getElementById("addrDetail")?.focus(); // 상세 주소 입력 필드로 자동 포커스
 
         // 주소 → 위도/경도 변환 요청
         fetchCoordsFromAddress(data.address);
       },
+      // @ts-expect-error: 'open' 메서드에서 타입 오류 발생 가능성 있음
     }).open();
   };
 
@@ -219,7 +220,11 @@ export default function CreatePostPage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 1.5 }}
       className="min-h-screen bg-gray-100 flex flex-col items-center py-10 px-4"
-    >
+      >
+     <Script
+        src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
+        strategy="lazyOnload" // ✅ 사용자가 페이지를 방문한 후 로드
+      />
       <h1 className="text-3xl font-bold text-gray-800 mb-6">📝 게시물 작성</h1>
 
       <form
@@ -528,9 +533,9 @@ export default function CreatePostPage() {
             required
           />
         </div>
-        <body>
+        {/* <body>
           <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-        </body>
+        </body> */}
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"

@@ -116,6 +116,7 @@ export default function SignupPage() {
                     baseAddress: `${data.address} ${data.buildingName || ''}`.trim()
                 }));
             }
+            // @ts-expect-error: 'open' 메서드에서 타입 오류 발생 가능성 있음
         }).open();
     };
 
@@ -135,7 +136,8 @@ export default function SignupPage() {
                 clearInterval(intervalRef.current);
             }
         } catch (err) {
-            setErrors({email: '인증 코드 전송에 실패했습니다'});
+            console.error('Error sending verification code:', err); // 에러 로그 출력
+            setErrors({ email: '인증 코드 전송에 실패했습니다' });
         }
     };
 
@@ -158,11 +160,13 @@ export default function SignupPage() {
                 setCurrentStep(prev => Math.min(prev + 1, 3)); // 3은 최대 단계 수
             }, 1000);
         } catch (err) {
-            setErrors(prev => ({...prev, verification: '인증 코드가 일치하지 않습니다'}));
+            console.error('Error verifying email:', err); // 에러 로그 출력
+            setErrors(prev => ({ ...prev, verification: '인증 코드가 일치하지 않습니다' }));
         }
     };
 
     // 회원 가입 제출
+    //@ts-expect-error: React 에러 가능성 있음
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -198,7 +202,7 @@ export default function SignupPage() {
                 router.push('/login');
             }
 
-        } catch (err) {
+        } catch (err : any) {
             if (err.type === 'LOCATION_ERROR') {
             setError(`🗺️ 지역 제한 서비스 안내
 • 현재 위치에서 5km 이내 지역만 서비스 제공`);
