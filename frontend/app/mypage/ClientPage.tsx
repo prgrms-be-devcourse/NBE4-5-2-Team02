@@ -76,30 +76,8 @@ export default function ClientPage() {
     credit: 0,
   });
   const [reservations, setReservations] = useState<Reservations>({
-    rentals: [
-      {
-        id: 0,
-        title: "",
-        image: "",
-        amount: 0,
-        startTime: "",
-        endTime: "",
-        status: "",
-        isReviewed: false,
-      },
-    ],
-    borrows: [
-      {
-        id: 0,
-        title: "",
-        image: "",
-        amount: 0,
-        startTime: "",
-        endTime: "",
-        status: "",
-        isReviewed: false,
-      },
-    ],
+    rentals: [],
+    borrows: [],
   });
   const [eventType, setEventType] = useState("rental");
   const [date, setDate] = useState(new Date());
