@@ -9,6 +9,7 @@ import ScoreIcon from "../lib/util/scoreIcon";
 import Link from "next/link";
 import Image from "next/image";
 import { fetchWithAuth } from "../lib/util/fetchWithAuth";
+import { useRouter } from "next/navigation";
 
 interface Me {
   id: number;
@@ -89,14 +90,23 @@ export default function ClientPage() {
   );
   const [isCancelButton, setIsCancelButton] = useState(true);
 
-  const BASE_URL = "http://localhost:8080";
-
   const localizer = momentLocalizer(moment);
+  const router = useRouter();
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
   useEffect(() => {
     getMe();
     getReservations();
   }, []);
+
+  const fetchHelper = async (url: string, options?: RequestInit) => {
+    const accessToken = sessionStorage.getItem("access_token");
+    if (accessToken) {
+      return fetchWithAuth(url, options);
+    } else {
+      return fetch(url, options);
+    }
+  };
 
   const handleNavigate = (newDate: Date) => {
     setDate(newDate);
@@ -210,7 +220,7 @@ export default function ClientPage() {
 
   //유저정보 조회
   const getMe = async () => {
-    const getMyInfo = await fetchWithAuth(`${BASE_URL}/api/v1/mypage/me`, {
+    const getMyInfo = await fetchHelper(`${BASE_URL}/api/v1/mypage/me`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -220,18 +230,24 @@ export default function ClientPage() {
 
     if (getMyInfo.ok) {
       const Data = await getMyInfo.json();
+      if (Data?.code.startsWith("403")) {
+        router.push("/login");
+      }
       if (Data?.code !== "200-1") {
         console.error(`에러가 발생했습니다. \n${Data?.msg}`);
       }
       setMe(Data?.data);
     } else {
+      if (getMyInfo.status === 403) {
+        router.push("/login");
+      }
       console.error("Error fetching data:", getMyInfo.status);
     }
   };
 
   //예약정보 조회
   const getReservations = async () => {
-    const getMyReservations = await fetchWithAuth(
+    const getMyReservations = await fetchHelper(
       `${BASE_URL}/api/v1/mypage/reservations`,
       {
         method: "GET",
@@ -268,7 +284,7 @@ export default function ClientPage() {
     formData.append("profileImage", file);
 
     try {
-      const uploadProfile = await fetchWithAuth(
+      const uploadProfile = await fetchHelper(
         `${BASE_URL}/api/v1/mypage/profile`,
         {
           method: "POST",
@@ -313,7 +329,7 @@ export default function ClientPage() {
 
   const handleDeleteProfile = async () => {
     try {
-      const deleteProfile = await fetchWithAuth(
+      const deleteProfile = await fetchHelper(
         `${BASE_URL}/api/v1/mypage/profile`,
         {
           method: "DELETE",
@@ -360,7 +376,7 @@ export default function ClientPage() {
 
   const handleWithdrawMembership = async () => {
     try {
-      const withdrawMembership = await fetchWithAuth(
+      const withdrawMembership = await fetchHelper(
         `${BASE_URL}/api/v1/mypage/me`,
         {
           method: "DELETE",
