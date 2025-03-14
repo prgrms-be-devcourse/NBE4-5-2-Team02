@@ -1,5 +1,7 @@
 import ClientPage from "./ClientPage";
 
+// 페이지 디렉토리 이동 필요 예상 -> (app/post/[id]/reservation/)
+
 export default async function Page({
   params,
 }: {
@@ -9,5 +11,5 @@ export default async function Page({
 }) {
   const { id } = await params;
 
-  return <ClientPage rid={id} />;
+  return <ClientPage postid={id} />;
 }

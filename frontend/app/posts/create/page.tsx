@@ -4,9 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
-interface Window {
-  daum: any;
-}
+// interface Window {
+//   daum: any;
+// }
 
 interface IAddr {
   address: string;

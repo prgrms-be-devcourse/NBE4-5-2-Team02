@@ -59,9 +59,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 // 인증 객체 생성 및 저장
                 CustomUserDetails customUserDetails = new CustomUserDetails(username, email, userId);
-                Authentication authentication = new UsernamePasswordAuthenticationToken(customUserDetails,
+                /*Authentication authentication = new UsernamePasswordAuthenticationToken(customUserDetails,
                         null, Collections.emptyList());
-                log.info("authentication={}", authentication);
+                log.info("authentication={}", authentication);*/
+
+                //test
+                List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+                Authentication authentication = new UsernamePasswordAuthenticationToken(customUserDetails, null, authorities);
+
+                log.info("Authentication 생성됨: {}", authentication);
+
+                //test
+//                List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+//                Authentication authentication = new UsernamePasswordAuthenticationToken(customUserDetails, null, authorities);
+
+//                log.info("Authentication 생성됨: {}", authentication);
+
+                //test
+//                List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+//                Authentication authentication = new UsernamePasswordAuthenticationToken(customUserDetails, null, authorities);
+
+//                log.info("Authentication 생성됨: {}", authentication);
 
                 //test
 //                List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
