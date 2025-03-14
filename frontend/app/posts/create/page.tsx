@@ -179,7 +179,8 @@ export default function CreatePostPage() {
 
         // 주소 → 위도/경도 변환 요청
         fetchCoordsFromAddress(data.address);
-      },
+        },
+    // @ts-expect-error: type problem in mypage-edit in kakao address search
     }).open();
   };
 
