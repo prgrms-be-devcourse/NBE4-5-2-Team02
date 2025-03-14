@@ -120,7 +120,7 @@ export default function CreatePostPage() {
     });
   };
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
     
   // 게시물 등록 요청 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
@@ -152,7 +152,7 @@ export default function CreatePostPage() {
       images.forEach((image) => formData.append("images", image));
 
       // API 요청
-      const response = await fetch(`${API_BASE_URL}/api/v1/posts`, {
+      const response = await fetch(`${BASE_URL}/api/v1/posts`, {
         method: "POST",
         credentials: "include",
         body: formData,
