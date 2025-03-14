@@ -53,6 +53,7 @@ export default function PostsPage() {
   // 게시물 상태값
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
+
   const [error, setError] = useState("");
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -169,6 +170,7 @@ export default function PostsPage() {
         const filteredNewPosts = newPosts.filter(
           (post) => !existingIds.has(post.id)
         );
+
         return [...prevPosts, ...filteredNewPosts];
       });
 
@@ -364,4 +366,3 @@ export default function PostsPage() {
       </div>
     </motion.div>
   );
-}
