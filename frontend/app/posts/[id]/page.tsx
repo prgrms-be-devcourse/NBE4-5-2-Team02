@@ -34,14 +34,14 @@ export default function PostDetailPage() {
   const [post, setPost] = useState<PostDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
   useEffect(() => {
     const fetchPostDetail = async () => {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/api/v1/posts/${id}`,
+          `${BASE_URL}/api/v1/posts/${id}`,
           {
             method: "GET",
             credentials: "include",
