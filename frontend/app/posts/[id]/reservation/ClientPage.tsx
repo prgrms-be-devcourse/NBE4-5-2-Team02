@@ -768,11 +768,6 @@ export default function ClientPage({ postid }: { postid: number }) {
                   {date.toLocaleDateString("ko-KR", { weekday: "short" })}
                 </div>
               ),
-              day: ({ date }: { date: Date }) => (
-                <div className="text-right pr-2 pt-1 text-gray-600 text-sm">
-                  {date.getDate()}
-                </div>
-              ),
             },
           }}
         />
