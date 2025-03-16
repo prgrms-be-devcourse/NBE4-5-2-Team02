@@ -38,6 +38,8 @@ export default function LoginPage() {
             if (response.ok) {
                 login(); // AuthContext의 login 호출
                 sessionStorage.setItem('sessionActive', 'true'); // 세션 플래그 설정
+                sessionStorage.setItem('nickname', data.data.nickname);
+                sessionStorage.setItem('user_id', data.data.user_id)
                 router.push('/')
             }
             if (!response.ok) {
@@ -51,7 +53,7 @@ export default function LoginPage() {
     };
 
     // Google 로그인 URL 생성 + 리프레시 토큰 요청
-    const googleLoginUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=14635661476-clsktcbo2qdhshsd60onck423l80v223.apps.googleusercontent.com&redirect_uri=http://localhost:3000/redirect&scope=openid%20https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email&access_type=offline&prompt=consent`;
+    const googleLoginUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=14635661476-clsktcbo2qdhshsd60onck423l80v223.apps.googleusercontent.com&redirect_uri=${BASE_URL}/redirect&scope=openid%20https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email&access_type=offline&prompt=consent`;
 
     // 인증 코드 처리
     useEffect(() => {
@@ -84,6 +86,7 @@ export default function LoginPage() {
                     // 세션 스토리지에 액세스 토큰과 provider_id 저장
                     sessionStorage.setItem('access_token', data.data.access_token);
                     sessionStorage.setItem('user_id', data.data.user_id);
+                    sessionStorage.setItem('nickname', data.data.nickname);
 
                     // 🔥 추가 정보 필요 여부 체크
                     if (data.data?.additionalInfoRequired) {
