@@ -31,7 +31,8 @@ export default function ChatPage() {
     const [selectedChat, setSelectedChat] = useState<string | null>(null); // 선택된 채팅방
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const BASE_URL = "http://localhost:8080";
+    const BASE_URL: string = process.env.NEXT_PUBLIC_BASE_URL as string;
+    const strippedURL = BASE_URL.split("http://")[1];
 
     // 날짜 포맷팅 유틸 함수 추가
     const formatDate = (dateString: string) => {
@@ -59,9 +60,9 @@ export default function ChatPage() {
 
             try {
                 const response = await fetchWithAuth(`${BASE_URL}/api/chat/channels?userId=${userId}`);
-                if (response.ok) {
+
+                if (response?.ok) {
                     const result: RsData<string[]> = await response.json();
-                    console.log("채팅 목록:", result.data);
                     setChatRooms(result.data); // API 응답에서 채널 목록 설정
                 } else {
                     console.error("Failed to fetch chat rooms");
@@ -84,7 +85,7 @@ export default function ChatPage() {
     const fetchChatHistory = async (channelName: string) => {
         try {
             const response = await fetchWithAuth(`${BASE_URL}/api/chat/history?channelName=${channelName}`);
-            if (response.ok) {
+            if (response?.ok) {
                 const result: RsData<Message[]> = await response.json();
                 console.log("채팅 내역:", result.data);
                 setMessages(result.data); // 가져온 메시지를 상태에 저장
@@ -128,7 +129,7 @@ export default function ChatPage() {
                 {method: "DELETE"}
             );
 
-            if (response.ok) {
+            if (response?.ok) {
                 const result: RsData<boolean> = await response.json();
                 console.log(result.message);
 
@@ -152,7 +153,7 @@ export default function ChatPage() {
 
     // WebSocket 연결 설정
     useEffect(() => {
-        ws.current = new WebSocket(`ws://localhost:8080/chat?userId=${sessionStorage.getItem('user_id')}`); // 서버 WebSocket URL
+        ws.current = new WebSocket(`ws://${strippedURL}/chat?userId=${sessionStorage.getItem('user_id')}`); // 서버 WebSocket URL
         ws.current.onopen = () => console.log("WebSocket 연결 성공");
         ws.current.onmessage = (event) => {
             try {
@@ -275,7 +276,7 @@ export default function ChatPage() {
                         </div>
                     ))
                 ) : (
-                    <div style={styles.emptyChatContainer}>
+                    <div style={styles.emptyChatContainer as React.CSSProperties}>
                         <h3 style={styles.emptyChatHeader}>채팅을 시작해 보세요!</h3>
                         <p style={styles.emptyChatMessage}>
                             아직 참여 중인 채팅방이 없습니다.
@@ -360,7 +361,9 @@ export default function ChatPage() {
     );
 }
 
-const styles = {
+import { CSSProperties } from 'react';
+
+const styles: { [key: string]: CSSProperties } = {
     container: {
         display: "flex" as const,
         height: "90vh",
@@ -377,7 +380,7 @@ const styles = {
         width: "30%",
         backgroundColor: "#1a1a1a",
         padding: "0",
-        overflowY: "auto",
+        overflowY: "auto" as const,
         borderRight: "1px solid #2d2d2d",
 
         // 신규 스크롤바 디자인
@@ -389,6 +392,7 @@ const styles = {
         position: "relative" as const,
         borderBottom: "1px solid #333333", // Tailwind green-800
         backdropFilter: "blur(8px)",
+        // @ts-expect-error: chatListHeaderContainer error in app/chat
         "&:hover": {
             backgroundColor: "rgba(51, 51, 51, 0.1)" // Tailwind green-700 with opacity
         }
@@ -404,6 +408,7 @@ const styles = {
         width: "100%", // 전체 너비 적용
         gap: "8px",
         transition: 'all 0.3s ease',
+        // @ts-expect-error: chatListHeader error in app/chat
         '&:hover': {
             background: 'linear-gradient(to right, #166534 0%, #14532d 100%)'
         }
@@ -601,6 +606,7 @@ const styles = {
         alignItems: "center",
         gap: "6px",
         transition: "all 0.2s ease",
+        // @ts-expect-error: leaveButton error in app/chat
         "&:hover": {
             backgroundColor: "rgba(255, 95, 87, 0.2)",
             transform: "scale(1.05)",
