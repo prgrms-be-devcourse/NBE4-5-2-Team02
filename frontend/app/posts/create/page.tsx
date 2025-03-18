@@ -30,10 +30,6 @@ import {
 import { fetchWithAuth } from "@/app/lib/util/fetchWithAuth";
 import { MapPinIcon } from "@heroicons/react/24/solid";
 
-// interface Window {
-//     daum: any;
-// }
-
 interface IAddr {
   address: string;
   zonecode: string;
