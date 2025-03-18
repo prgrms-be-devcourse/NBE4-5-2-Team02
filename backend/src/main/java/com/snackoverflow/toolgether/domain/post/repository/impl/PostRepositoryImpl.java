@@ -11,7 +11,6 @@ import com.snackoverflow.toolgether.domain.post.entity.QPost;
 import com.snackoverflow.toolgether.domain.post.repository.PostRepositoryCustom;
 import com.snackoverflow.toolgether.domain.postavailability.entity.PostAvailability;
 import com.snackoverflow.toolgether.domain.postavailability.entity.QPostAvailability;
-import com.snackoverflow.toolgether.domain.postimage.entity.PostImage;
 import com.snackoverflow.toolgether.domain.postimage.entity.QPostImage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
