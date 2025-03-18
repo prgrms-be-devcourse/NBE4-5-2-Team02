@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PhoneIcon, MapPinIcon, DocumentMagnifyingGlassIcon, ExclamationTriangleIcon } from '@heroicons/react/24/solid';
 import { AddressData } from "@/types/d";
 import {CheckCircleIcon} from "lucide-react";
+import {fetchWithAuth} from "@/app/lib/util/fetchWithAuth";
 
 export default function ClientPage() {
     const router = useRouter();
@@ -126,7 +127,7 @@ export default function ClientPage() {
         });
 
         try {
-            const response = await fetch(`${BASE_URL}/oauth/users/additional-info`, {
+            const response = await fetchWithAuth(`${BASE_URL}/oauth/users/additional-info`, {
                 method: 'PATCH',
                 credentials: 'include',
                 headers: {
@@ -142,9 +143,9 @@ export default function ClientPage() {
                 }),
             });
 
-            const data = await response.json();
+            const data = await response?.json();
 
-            if (!response.ok || data.code === "400-1") {
+            if (!response?.ok || data.code === "400-1") {
                 throw {
                     type: 'LOCATION_ERROR',
                     message: '위치 정보 오류',
