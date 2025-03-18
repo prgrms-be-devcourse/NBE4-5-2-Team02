@@ -10,11 +10,11 @@ jwt:
 cors:
   allowed:
     origins: http://localhost:3000, https://toolgether-delta.vercel.app
-
+    
 spring:
   data:
     redis:
-      host: toolgether-redis
+      host: localhost
       port: 6379
   
   security:
