@@ -52,7 +52,6 @@ export default function PostsPage() {
     // 게시물 상태값
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(false);
-    // const [ setError] = useState('');
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
 
