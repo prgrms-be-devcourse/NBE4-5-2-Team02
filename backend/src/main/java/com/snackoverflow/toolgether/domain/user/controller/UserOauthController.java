@@ -24,7 +24,6 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
 public class UserOauthController {
 
     private final OauthService oauthService;
