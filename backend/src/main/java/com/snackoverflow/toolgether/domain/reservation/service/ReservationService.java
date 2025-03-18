@@ -1,6 +1,5 @@
 package com.snackoverflow.toolgether.domain.reservation.service;
 
-import com.snackoverflow.toolgether.domain.post.dto.PostResponse;
 import com.snackoverflow.toolgether.domain.post.repository.PostRepository;
 import com.snackoverflow.toolgether.domain.reservation.dto.PostReservationResponse;
 import com.snackoverflow.toolgether.domain.reservation.entity.Reservation;
@@ -8,14 +7,11 @@ import com.snackoverflow.toolgether.domain.reservation.entity.ReservationStatus;
 import com.snackoverflow.toolgether.domain.reservation.repository.ReservationRepository;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,7 +44,6 @@ import com.snackoverflow.toolgether.domain.user.service.UserService;
 import com.snackoverflow.toolgether.global.exception.custom.ErrorResponse;
 import com.snackoverflow.toolgether.global.exception.custom.CustomException;
 
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -68,14 +63,14 @@ public class ReservationService {
 	@PostConstruct
 	public void init() {
 		try {
-			if (!scheduler.isStarted()) { // 이미 시작되었는지 확인.  불필요한 재시작 방지.
+			if (!scheduler.isStarted()) { // 이미 시작되었는지 확인, 불필요한 재시작 방지
 				scheduler.start();
 				log.info("Quartz Scheduler started.");
 			}
 		} catch (SchedulerException e) {
 			log.error("Failed to start Quartz Scheduler", e);
 			// throw new RuntimeException("Failed to start Quartz Scheduler", e); // 또는 다른 예외 처리
-			// 시작 실패 시, 애플리케이션을 중단시키는 것이 좋을 수도 있음.
+			// 시작 실패 시, 애플리케이션을 중단시키는 것이 좋을 수도 있음
 		}
 	}
 
