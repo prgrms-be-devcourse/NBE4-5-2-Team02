@@ -8,6 +8,10 @@ jwt:
   expiration: 86400000 # 24시간(초 단위)
 
 spring:
+  data:
+    redis:
+      host: toolgether-redis
+      port: 6379
   
   security:
     oauth2:
@@ -16,7 +20,7 @@ spring:
           google:
             client-id: [change]
             client-secret: [change]
-            redirect-uri: http://localhost:3000/redirect
+            redirect-uri: https://toolgether-delta.vercel.app/redirect
             scope:
               - openid
               - https://www.googleapis.com/auth/userinfo.profile
