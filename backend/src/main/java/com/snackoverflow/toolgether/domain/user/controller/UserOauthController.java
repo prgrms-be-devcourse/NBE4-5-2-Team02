@@ -46,7 +46,7 @@ public class UserOauthController {
             setRefreshTokenCookie(response, tokens.get("refresh_token"));
 
             // 액세스 토큰에서 유저 정보 추출
-            Map<String, Object> userInfo = oauthService.getUserInfo(tokens.get("access_token"));
+            Map<String, Object> userInfo = oauthService.getUserInfo(tokens.get("access_token"), tokens.get("refresh_token"));
             String email = (String) userInfo.get("email");
             log.info("userInfo = {}", userInfo);
 
