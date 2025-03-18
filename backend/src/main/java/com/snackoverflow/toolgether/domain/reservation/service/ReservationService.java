@@ -77,10 +77,22 @@ public class ReservationService {
 	// 예약 요청 (일정 충돌 방지 로직 필요)
 	@Transactional
 	public ReservationResponse requestReservation(ReservationRequest reservationRequest) {
+		// 1. Post, Renter, Owner 조회
 		Post post = postService.findPostById(reservationRequest.postId());
 		User renter = userService.findUserById(reservationRequest.renterId());
 		User owner = userService.findUserById(reservationRequest.ownerId());
 
+		// 2. 일정 충돌 검증 (비관적 락 적용)
+		List<Reservation> conflictingReservations = reservationRepository.findConflictingReservations(
+				reservationRequest.postId(),
+				reservationRequest.startTime(),
+				reservationRequest.endTime());
+
+		if (!conflictingReservations.isEmpty()) {
+			throw new IllegalArgumentException("해당 시간대에는 이미 예약이 존재합니다.");
+		}
+
+		// 3. 예약 생성 및 저장
 		Double totalAmount = reservationRequest.deposit() + reservationRequest.rentalFee();
 		Reservation reservation = Reservation.builder()
 			.post(post)
@@ -95,7 +107,7 @@ public class ReservationService {
 
 		reservationRepository.save(reservation);
 
-		// 예약 요청 시 보증금 결제 -> DepositHistory 추가
+		// 4. DepositHistory 생성 및 저장
 		DepositHistory depositHistory = DepositHistory.builder()
 			.reservation(reservation)
 			.user(reservation.getRenter()) // 보증금은 대여자가 지불
@@ -105,6 +117,8 @@ public class ReservationService {
 			.build();
 
 		depositHistoryService.createDepositHistory(depositHistory);
+
+		// 5. Response 반환
 		return new ReservationResponse(reservation.getId(),
 			reservation.getStatus().name(),
 			reservation.getPost().getId(),
