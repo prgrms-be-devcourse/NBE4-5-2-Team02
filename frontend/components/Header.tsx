@@ -89,6 +89,8 @@ export default function Header() {
       getMyProfile();
       const userId = sessionStorage.getItem("user_id");
       if (userId) {
+        fetchUnreadNotifications(Number(userId));
+
         const eventSource = new EventSource(
           `${BASE_URL}/api/v1/sse/connect/${userId}`
         );
