@@ -30,7 +30,6 @@ public class NotificationService {
 			.createdAt(LocalDateTime.now())
 			.isRead(false)
 			.build();
-		notificationRepository.save(notification);
 		Notification savedNotification = notificationRepository.save(notification);
 
 		// 이벤트 발행
